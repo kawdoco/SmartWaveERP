@@ -1,5 +1,19 @@
 # SmartWave ERP - Enterprise Resource Planning System
 
+## 📋 Project Description
+
+**SmartWave ERP** is a specialized barcode-based system designed for textile retailers that streamlines business operations through:
+
+- **📦 Purchasing Management**: Complete management of finished garments procurement
+- **🏷️ Inventory Tracking**: Advanced inventory control by size and color variations
+- **💳 POS Integration**: Point-of-sale system for efficient retail transactions
+- **⚡ Real-Time Updates**: Automatic stock updates with every transaction
+- **✅ Error Reduction**: Barcode scanning minimizes manual entry errors
+- **📊 Reporting**: Accurate sales analytics and stock reports for informed decision-making
+- **⚙️ Operational Efficiency**: Streamlined workflows for improved productivity
+
+This system is purpose-built to address the unique challenges of textile retail, where managing multiple SKUs with size and color variants is critical for business success.
+
 ## 🏗️ Project Structure
 
 This is a monorepo containing both frontend and backend for the SmartWave ERP system.
