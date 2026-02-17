@@ -7,7 +7,7 @@ const inter = Inter({
   display: "swap",
   variable: "--font-inter",
 });
-
+/* this is a test comment */
 export const metadata: Metadata = {
   title: "SmartWave ERP - Enterprise Resource Planning",
   description: "Modern enterprise resource planning system for streamlined business operations",
