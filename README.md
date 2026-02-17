@@ -25,7 +25,11 @@ SmartWaveERP/
 │   │   └── app/      # App Router pages
 │   ├── public/       # Static assets
 │   └── package.json
-├── backend/          # Spring Boot application (to be created)
+├── backend/          # Spring Boot application
+│   ├── src/
+│   │   ├── main/java/com/smartwave/erp/  # Java source code
+│   │   └── resources/                    # Configuration files
+│   └── pom.xml       # Maven dependencies
 └── docs/            # Documentation
 ```
 
@@ -37,10 +41,13 @@ SmartWaveERP/
 - **Styling**: Tailwind CSS v4
 - **UI**: React 19
 
-### Backend (To be implemented)
-- **Framework**: Java Spring Boot
+### Backend
+- **Framework**: Spring Boot 3.2.2
+- **Language**: Java 17 LTS
+- **Build Tool**: Maven
 - **Database**: PostgreSQL (Supabase)
-- **Authentication**: Spring Security
+- **Security**: Spring Security
+- **ORM**: Spring Data JPA
 
 ## 📦 Frontend Setup
 
@@ -52,11 +59,53 @@ npm install    # Already done
 npm run dev    # Start development server
 ```
 
-The application will be available at `http://localhost:3000`
 
-## 🛠️ Available Scripts (Frontend)
 
-- `npm run dev` - Start development server
+## 📦 Backend Setup
+
+The backend has been initialized with Spring Boot. To get started:
+
+```bash
+cd backend
+mvn clean install      # Install dependencies
+mvn spring-boot:run    # Start development server
+```
+
+The API will be available at `http://localhost:8080/api`
+
+### Verify Backend Health
+
+```bash
+curl http://localhost:8080/api/health
+```
+
+### Prerequisites
+
+- Java 17 or higher
+- Maven 3.6+
+- PostgreSQL database (to be configured with Supabase)
+###✅ Initialize Spring Boot project
+2. ✅ Configure Spring Security (permissive mode for development)
+3. ✅ Set up CORS for frontend integration
+4. ✅ Create health check endpoint
+5. Set up PostgreSQL connection with Supabase
+6. Implement JWT authentication
+7. Create entity models for domain objects
+8. Build RESTful API endpoints for modulement server
+npm run build  # Build for production
+npm start      # Start production server
+npm run lint   # Run ESLint
+```
+
+### Backend
+
+```bash
+cd backend
+mvn clean install      # Install dependencies
+mvn spring-boot:run    # Start development server
+mvn test              # Run tests
+mvn package           # Build JAR file
+```opment server
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
