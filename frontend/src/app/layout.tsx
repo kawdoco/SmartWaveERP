@@ -1,34 +1,28 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+"use client";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-/* this is a test comment */
-export const metadata: Metadata = {
-  title: "SmartWave ERP - Enterprise Resource Planning",
-  description: "Modern enterprise resource planning system for streamlined business operations",
-  keywords: ["ERP", "Enterprise", "Business Management", "SmartWave"],
-  authors: [{ name: "SmartWave Technologies" }],
-  openGraph: {
-    title: "SmartWave ERP",
-    description: "Modern enterprise resource planning system",
-    type: "website",
-  },
-};
+import { usePathname } from 'next/navigation';
+import Sidebar from '../components/Sidebar Navigation';
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased`}>
-        {children}
+    <html lang="en">
+      <body style={{ margin: 0 }}>
+        <div style={{ display: 'flex' }}>
+          {/* Hides Sidebar on Login Route */}
+          {!isLoginPage && <Sidebar />}
+
+          <main style={{ 
+            flex: 1, 
+            marginLeft: isLoginPage ? '0' : '260px', 
+            minHeight: '100vh',
+            backgroundColor: '#F9FAFB' 
+          }}>
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
