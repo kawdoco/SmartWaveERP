@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
 
   const menuConfig = [
     { label: 'Dashboard', href: '/', icon: dashboardIcon },
-    { label: 'User Management', href: '/users', icon: userIcon },
+    { label: 'User Management', href: '/user', icon: userIcon },
     { label: 'Products', href: '/products', icon: productsIcon },
     { label: 'Procurement', href: '/procurement', icon: procurementIcon },
     { label: 'Inventory', href: '/inventory', icon: inventoryIcon },
