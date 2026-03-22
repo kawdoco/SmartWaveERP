@@ -1,9 +1,12 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
+import AddProductModal from '../../components/AddProductModal';
 
 export default function ProductCatalogPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div
       style={{
@@ -45,6 +48,7 @@ export default function ProductCatalogPage() {
         </div>
         
         <button
+          onClick={() => setIsModalOpen(true)}
           style={{
             display: "flex",
             alignItems: "center",
@@ -123,6 +127,8 @@ export default function ProductCatalogPage() {
           </div>
         </div>
       </div>
+
+      <AddProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
