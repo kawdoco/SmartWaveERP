@@ -5,6 +5,7 @@ import { useState } from "react";
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const styles = {
     page: {
@@ -23,7 +24,6 @@ export default function UsersPage() {
       fontSize: "32px",
       fontWeight: "700",
       color: "#0F172A",
-      marginBottom: "5px",
     },
     subtitle: {
       color: "#64748B",
@@ -36,7 +36,6 @@ export default function UsersPage() {
       borderRadius: "10px",
       border: "none",
       cursor: "pointer",
-      fontWeight: "500",
     },
     card: {
       backgroundColor: "#FFFFFF",
@@ -53,7 +52,6 @@ export default function UsersPage() {
       padding: "12px",
       borderRadius: "10px",
       border: "1px solid #E2E8F0",
-      outline: "none",
       fontSize: "14px",
     },
     tableHeader: {
@@ -69,21 +67,70 @@ export default function UsersPage() {
       gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
       padding: "15px",
       borderTop: "1px solid #E2E8F0",
-      alignItems: "center",
     },
     roleBadge: {
       backgroundColor: "#F1F5F9",
-      color: "#0F172A",
       padding: "5px 10px",
       borderRadius: "20px",
       fontSize: "12px",
-      display: "inline-block",
-      fontWeight: "500",
     },
-    action: {
-      color: "#0A2540",
+
+    /* MODAL */
+    overlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.4)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modal: {
+      backgroundColor: "#FFFFFF",
+      borderRadius: "16px",
+      padding: "30px",
+      width: "400px",
+    },
+    modalTitle: {
+      fontSize: "22px",
+      fontWeight: "700",
+      marginBottom: "20px",
+    },
+    label: {
+      fontSize: "14px",
+      marginBottom: "5px",
+      display: "block",
+    },
+    inputField: {
+      width: "100%",
+      padding: "10px",
+      marginBottom: "15px",
+      borderRadius: "8px",
+      border: "1px solid #E2E8F0",
+    },
+    buttonRow: {
+      display: "flex",
+      justifyContent: "space-between",
+      marginTop: "10px",
+    },
+    cancelBtn: {
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #E2E8F0",
+      background: "#FFFFFF",
       cursor: "pointer",
-      fontWeight: "500",
+      width: "48%",
+    },
+    createBtn: {
+      padding: "10px",
+      borderRadius: "8px",
+      border: "none",
+      background: "#0A2540",
+      color: "#FFFFFF",
+      cursor: "pointer",
+      width: "48%",
     },
   };
 
@@ -98,12 +145,16 @@ export default function UsersPage() {
           </div>
         </div>
 
-        <button style={styles.addButton}>+ Add User</button>
+        <button
+          style={styles.addButton}
+          onClick={() => setShowModal(true)}
+        >
+          + Add User
+        </button>
       </div>
 
       {/* CARD */}
       <div style={styles.card}>
-        {/* SEARCH */}
         <div style={styles.searchBox}>
           <input
             type="text"
@@ -114,7 +165,6 @@ export default function UsersPage() {
           />
         </div>
 
-        {/* TABLE HEADER */}
         <div style={styles.tableHeader}>
           <div>FULL NAME</div>
           <div>USERNAME</div>
@@ -123,19 +173,52 @@ export default function UsersPage() {
           <div>ACTIONS</div>
         </div>
 
-        {/* ROW */}
         <div style={styles.row}>
-          <div style={{ fontWeight: "600", color: "#0F172A" }}>
-            System Administrator
-          </div>
-          <div style={{ color: "#64748B" }}>admin</div>
+          <div>System Administrator</div>
+          <div>admin</div>
           <div>
             <span style={styles.roleBadge}>ADMIN</span>
           </div>
-          <div style={{ color: "#64748B" }}>2/23/2026</div>
-          <div style={styles.action}>Edit</div>
+          <div>2/23/2026</div>
+          <div>Edit</div>
         </div>
       </div>
+
+      {/* MODAL */}
+      {showModal && (
+        <div style={styles.overlay}>
+          <div style={styles.modal}>
+            <div style={styles.modalTitle}>Add New User</div>
+
+            <label style={styles.label}>Full Name</label>
+            <input style={styles.inputField} />
+
+            <label style={styles.label}>Username</label>
+            <input style={styles.inputField} />
+
+            <label style={styles.label}>Password</label>
+            <input type="password" style={styles.inputField} />
+
+            <label style={styles.label}>Role</label>
+            <select style={styles.inputField}>
+              <option>Admin</option>
+              <option>Cashier</option>
+            </select>
+
+            <div style={styles.buttonRow}>
+              <button
+                style={styles.cancelBtn}
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button style={styles.createBtn}>
+                Create User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
