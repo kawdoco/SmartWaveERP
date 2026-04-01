@@ -1,28 +1,21 @@
-"use client";
+import type { Metadata } from 'next';
+import './globals.css';
+import AppLayout from '../components/AppLayout';
 
-import { usePathname } from 'next/navigation';
-import Sidebar from '../components/Sidebar Navigation';
+export const metadata: Metadata = {
+  title: 'SmartWave ERP',
+  description: 'Enterprise Resource Planning System',
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isLoginPage = pathname === '/login';
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body style={{ margin: 0 }}>
-        <div style={{ display: 'flex' }}>
-          {/* Hides Sidebar on Login Route */}
-          {!isLoginPage && <Sidebar />}
-
-          <main style={{ 
-            flex: 1, 
-            marginLeft: isLoginPage ? '0' : '260px', 
-            minHeight: '100vh',
-            backgroundColor: '#F9FAFB' 
-          }}>
-            {children}
-          </main>
-        </div>
+      <body style={{ margin: 0, backgroundColor: '#f8fafc', color: '#0f172a', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );
