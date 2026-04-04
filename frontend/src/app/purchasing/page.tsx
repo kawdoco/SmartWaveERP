@@ -48,7 +48,7 @@ export default function ProcurementPage() {
               color: "#64748B",
             }}
           >
-            Manage suppliers and purchase orders.
+            Manage purchase orders.
           </p>
         </div>
 
