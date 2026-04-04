@@ -10,11 +10,6 @@ export default function ProcurementPage() {
     date: string;
   }[] = [];
 
-  const suppliers: {
-    id: string;
-    name: string;
-  }[] = [];
-
   return (
     <div
       style={{
@@ -58,7 +53,8 @@ export default function ProcurementPage() {
         </div>
 
         <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-          <button
+          <Link
+            href="/purchasing/suppliers"
             style={{
               display: "flex",
               alignItems: "center",
@@ -69,11 +65,12 @@ export default function ProcurementPage() {
               backgroundColor: "#FFFFFF",
               color: "#0F172A",
               cursor: "pointer",
+              textDecoration: "none",
             }}
           >
             <UserPlus size={18} />
             Add Supplier
-          </button>
+          </Link>
 
           <Link
             href="/purchasing/create-po"
@@ -97,7 +94,7 @@ export default function ProcurementPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
+          gridTemplateColumns: "1fr",
           gap: "24px",
         }}
       >
@@ -169,49 +166,6 @@ export default function ProcurementPage() {
               )}
             </tbody>
           </table>
-        </div>
-
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E2E8F0",
-            borderRadius: "20px",
-            padding: "24px",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "22px",
-              fontWeight: "700",
-              color: "#0F172A",
-              marginBottom: "10px",
-            }}
-          >
-            Suppliers
-          </h2>
-
-          {suppliers.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {suppliers.map((supplier) => (
-                <div
-                  key={supplier.id}
-                  style={{
-                    padding: "12px",
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "12px",
-                    color: "#0F172A",
-                    backgroundColor: "#FFFFFF",
-                  }}
-                >
-                  {supplier.name}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: "#64748B" }}>
-              No suppliers added yet.
-            </p>
-          )}
         </div>
       </div>
     </div>
