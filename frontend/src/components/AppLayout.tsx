@@ -7,7 +7,7 @@ import Sidebar from './SidebarNavigation';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
-  
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobileScreen, setIsMobileScreen] = useState(false);
@@ -35,7 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
-      
+
       {/* Mobile Backdrop Map */}
       {isMobileOpen && isMobileScreen && (
         <div
@@ -52,20 +52,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Sidebar Injection */}
-      <Sidebar 
-        isCollapsed={isCollapsed} 
-        setIsCollapsed={setIsCollapsed} 
+      <Sidebar
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
         isMobileScreen={isMobileScreen}
       />
 
       {/* Main Content Pane */}
-      <div 
-        style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          flex: 1, 
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
           overflow: 'hidden',
           marginLeft: isMobileScreen ? '0' : marginLeftDesktop,
           transition: 'margin-left 0.3s ease'

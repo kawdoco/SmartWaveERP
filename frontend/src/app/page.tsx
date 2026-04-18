@@ -1,7 +1,23 @@
-import React from 'react';
-import { TrendingUp, Box, AlertTriangle, ShoppingCart, ArrowUpRight } from 'lucide-react';
+"use client";
 
-// Reusable Card Component for the Stats
+/**
+ * Root Page — /
+ *
+ * RESOLVED MERGE CONFLICT:
+ * This page now combines the "Auth Guard" logic from the dev_copy branch
+ * with the "Dashboard UI" (Stats Cards, Charts) from the dev branch.
+ *
+ * 1. Checks for JWT token in useEffect.
+ * 2. Redirects to /login if not authenticated.
+ * 3. Shows the Premium Dashboard UI once authenticated.
+ */
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { TrendingUp, Box, AlertTriangle, ShoppingCart, ArrowUpRight } from 'lucide-react';
+import { getStoredToken } from '@/lib/api';
+
+// --- Reusable Card Component for the Stats (from local head) ---
 const StatCard = ({ 
   title, 
   value, 
@@ -36,6 +52,23 @@ const StatCard = ({
 );
 
 export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // --- Auth Guard Logic (from dev_copy) ---
+  useEffect(() => {
+    const token = getStoredToken();
+    if (!token) {
+      router.replace('/login');
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, [router]);
+
+  // Show nothing while the auth check is happening (avoids flash of content)
+  if (!isAuthenticated) return null;
+
+  // --- Premium Dashboard UI (from local head) ---
   return (
     <main className="min-h-screen bg-[#F9FAFB] p-8 lg:p-12">
       {/* Welcome Header */}
@@ -87,7 +120,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 mb-6">Sales Performance</h2>
           <div className="border-t border-dashed border-gray-200 w-full" />
           <div className="h-full flex items-center justify-center text-gray-300 font-medium">
-             Chart area
+             Chart area (Connect data in next step)
           </div>
         </div>
         
@@ -96,7 +129,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 mb-6">Inventory Distribution</h2>
           <div className="border-t border-dashed border-gray-200 w-full" />
           <div className="h-full flex items-center justify-center text-gray-300 font-medium">
-             Chart area
+             Chart area (Connect data in next step)
           </div>
         </div>
       </div>
