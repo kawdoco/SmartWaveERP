@@ -1,0 +1,3047 @@
+{
+	"info": {
+		"_postman_id": "b723bc8f-390b-48ea-9474-63f4368df1d9",
+		"name": "SmartWave",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36169359"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/auth/login"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/auth/login"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:15:58 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3NjQ4OTM1OCwiZXhwIjoxNzc2NTc1NzU4fQ.BMsgphyCVslbtI5N-1sSK35Fvxp0xYoky4HZHcWOSP2AAf0FZse6idKDjtzlqcG6cXX-HK4LcAxvKy0EDAzArw\",\n    \"type\": \"Bearer\",\n    \"id\": 2,\n    \"username\": \"admin\",\n    \"email\": \"admin@smartwave.com\",\n    \"fullName\": \"System Administrator\",\n    \"role\": \"ADMIN\"\n}"
+						}
+					]
+				},
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"dulaksha_clerk\",\r\n  \"email\": \"dulaksha@smartwave.com\",\r\n  \"password\": \"secure123\",\r\n  \"fullName\": \"dulaksha\",\r\n  \"role\": \"INVENTORY_CLERK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/auth/register"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"dulaksha_clerk\",\r\n  \"email\": \"dulaksha@smartwave.com\",\r\n  \"password\": \"secure123\",\r\n  \"fullName\": \"dulaksha\",\r\n  \"role\": \"INVENTORY_CLERK\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/auth/register"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:19:00 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkdWxha3NoYV9jbGVyayIsImlhdCI6MTc3NjQ4OTUzOSwiZXhwIjoxNzc2NTc1OTM5fQ.naIqSVBdkiGeg51SrRNZGFBQxZCflz_Vvgkc68jPGYyMQJc-WzvWGEYgyUvwHnnEzIQFPOkh7ofjD6N8q61wdQ\",\n    \"type\": \"Bearer\",\n    \"id\": 4,\n    \"username\": \"dulaksha_clerk\",\n    \"email\": \"dulaksha@smartwave.com\",\n    \"fullName\": \"dulaksha\",\n    \"role\": \"INVENTORY_CLERK\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "user management",
+			"item": [
+				{
+					"name": "get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/users"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/users"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:22:49 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"username\": \"john_doe\",\n        \"email\": \"john@example.com\",\n        \"fullName\": \"John Doe\",\n        \"role\": \"CASHIER\",\n        \"isActive\": true\n    },\n    {\n        \"id\": 2,\n        \"username\": \"admin\",\n        \"email\": \"admin@smartwave.com\",\n        \"fullName\": \"System Administrator\",\n        \"role\": \"ADMIN\",\n        \"isActive\": true\n    },\n    {\n        \"id\": 3,\n        \"username\": \"jesmin_manager\",\n        \"email\": \"jesmin@smartwave.com\",\n        \"fullName\": \"Jesmin\",\n        \"role\": \"MANAGER\",\n        \"isActive\": true\n    },\n    {\n        \"id\": 4,\n        \"username\": \"dulaksha_clerk\",\n        \"email\": \"dulaksha@smartwave.com\",\n        \"fullName\": \"dulaksha\",\n        \"role\": \"INVENTORY_CLERK\",\n        \"isActive\": true\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "get user by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/users/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/users/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:24:28 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"username\": \"john_doe\",\n    \"email\": \"john@example.com\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"CASHIER\",\n    \"isActive\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "update user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"john_doe\",\r\n  \"fullName\": \"john Do\",\r\n  \"email\": \"johnd@smartwave.com\",\r\n  \"role\": \"CASHIER\",\r\n  \"isActive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/users/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"john_doe\",\r\n  \"fullName\": \"john Do\",\r\n  \"email\": \"johnd@smartwave.com\",\r\n  \"role\": \"CASHIER\",\r\n  \"isActive\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/users/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:35:35 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"username\": \"john_doe\",\n    \"email\": \"johnd@smartwave.com\",\n    \"fullName\": \"john Do\",\n    \"role\": \"CASHIER\",\n    \"isActive\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "delete user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{BASE_URL}}/api/users/4"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{BASE_URL}}/api/users/4"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "0"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:37:39 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "change user role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/users/3/role?role=MANAGER",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"3",
+								"role"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "MANAGER"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/api/users/3/role?role=INVENTORY_CLERK",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"3",
+										"role"
+									],
+									"query": [
+										{
+											"key": "role",
+											"value": "INVENTORY_CLERK"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:42:27 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"username\": \"jesmin_manager\",\n    \"email\": \"jesmin@smartwave.com\",\n    \"fullName\": \"Jesmin\",\n    \"role\": \"INVENTORY_CLERK\",\n    \"isActive\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "toggle user active status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"isActive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/users/3/toggle-status"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"isActive\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/users/3/toggle-status"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:46:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"username\": \"jesmin_manager\",\n    \"email\": \"jesmin@smartwave.com\",\n    \"fullName\": \"Jesmin\",\n    \"role\": \"MANAGER\",\n    \"isActive\": false\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "system",
+			"item": [
+				{
+					"name": "health check (simple)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/health"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/health"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:49:35 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Service is healthy\",\n    \"status\": \"UP\",\n    \"timestamp\": \"2026-04-18T11:19:34.991831\"\n}"
+						}
+					]
+				},
+				{
+					"name": "health check (detail)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/health"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/health"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:51:10 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Service is healthy\",\n    \"data\": {\n        \"status\": \"UP\",\n        \"timestamp\": \"2026-04-18T11:21:10.4712675\",\n        \"service\": \"SmartWave ERP Backend\",\n        \"version\": \"0.0.1-SNAPSHOT\"\n    },\n    \"timestamp\": \"2026-04-18T11:21:10.4739763\"\n}"
+						}
+					]
+				},
+				{
+					"name": "root",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 05:52:43 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"SmartWave ERP Backend is running!\",\n    \"status\": \"UP\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "suppliers",
+			"item": [
+				{
+					"name": "get all suppliers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/suppliers"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/suppliers"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 09:58:07 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Global Tech Industries\",\n        \"contactPerson\": \"Alice Johnson\",\n        \"phoneNumber\": \"0771234567\",\n        \"email\": \"alice@globaltech.com\",\n        \"address\": \"123 Industrial Zone, Colombo\",\n        \"bankDetails\": \"BOC - 88123456\",\n        \"status\": \"ACTIVE\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "create supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"BCI CAMPUS\",\r\n  \"contactPerson\": \"Anushka Dilshan\",\r\n  \"email\": \"anushka@bci.lk\",\r\n  \"phoneNumber\": \"0771234567\",\r\n  \"address\": \"123 djknnsn, Colombo\",\r\n  \"bankDetails\": \"BOC - 88123498\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/suppliers"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"BCI CAMPUS\",\r\n  \"contactPerson\": \"Anushka Dilshan\",\r\n  \"email\": \"anushka@bci.lk\",\r\n  \"phoneNumber\": \"0771234567\",\r\n  \"address\": \"123 djknnsn, Colombo\",\r\n  \"bankDetails\": \"BOC - 88123498\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/suppliers"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 10:08:33 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Supplier created successfully\",\n    \"data\": {\n        \"id\": 3,\n        \"name\": \"BCI CAMPUS\",\n        \"contactPerson\": \"Anushka Dilshan\",\n        \"phoneNumber\": \"0771234567\",\n        \"email\": \"anushka@bci.lk\",\n        \"address\": \"123 djknnsn, Colombo\",\n        \"bankDetails\": \"BOC - 88123498\",\n        \"status\": \"ACTIVE\"\n    },\n    \"timestamp\": \"2026-04-18T15:38:33.240634\"\n}"
+						}
+					]
+				},
+				{
+					"name": "get supplier by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/suppliers/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/suppliers/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 10:10:37 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"name\": \"Global Tech Industries\",\n    \"contactPerson\": \"Alice Johnson\",\n    \"phoneNumber\": \"0771234567\",\n    \"email\": \"alice@globaltech.com\",\n    \"address\": \"123 Industrial Zone, Colombo\",\n    \"bankDetails\": \"BOC - 88123456\",\n    \"status\": \"ACTIVE\"\n}"
+						}
+					]
+				},
+				{
+					"name": "update supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Global Industries\",\r\n  \"contactPerson\": \"Alice Johnson\",\r\n  \"email\": \"alice@global.com\",\r\n  \"phoneNumber\": \"0771234567\",\r\n  \"address\": \"123 Industrial Zone, Colombo\",\r\n  \"bankDetails\": \"BOC - 88123456\",\r\n  \"status\": \"ACTIVE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/suppliers/2"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Global Industries\",\r\n  \"contactPerson\": \"Alice Johnson\",\r\n  \"email\": \"alice@global.com\",\r\n  \"phoneNumber\": \"0771234567\",\r\n  \"address\": \"123 Industrial Zone, Colombo\",\r\n  \"bankDetails\": \"BOC - 88123456\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/suppliers/2"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 10:14:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Supplier updated successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Global Industries\",\n        \"contactPerson\": \"Alice Johnson\",\n        \"phoneNumber\": \"0771234567\",\n        \"email\": \"alice@global.com\",\n        \"address\": \"123 Industrial Zone, Colombo\",\n        \"bankDetails\": \"BOC - 88123456\",\n        \"status\": null\n    },\n    \"timestamp\": \"2026-04-18T15:44:04.4406051\"\n}"
+						}
+					]
+				},
+				{
+					"name": "delete supplier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{BASE_URL}}/api/suppliers/2"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{BASE_URL}}/api/suppliers/2"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 10:16:56 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Supplier deleted successfully\",\n    \"data\": null,\n    \"timestamp\": \"2026-04-18T15:46:56.990703\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "test",
+			"item": [
+				{
+					"name": "check role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/test/me"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "procurement",
+			"item": [
+				{
+					"name": "create purchase order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"supplierId\": 1,\r\n  \"items\": [\r\n    {\r\n      \"variantId\": 1,\r\n      \"quantity\": 50,\r\n      \"unitPrice\": 2400.0\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/procurement"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"supplierId\": 1,\r\n  \"items\": [\r\n    {\r\n      \"variantId\": 1,\r\n      \"quantity\": 50,\r\n      \"unitPrice\": 2400.0\r\n    }\r\n  ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/procurement"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:39:53 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Purchase Order created successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"supplierName\": \"Global Tech Industries\",\n        \"createdByFullName\": \"System Administrator\",\n        \"approvedByFullName\": null,\n        \"poDate\": \"2026-04-18T21:09:49.2467006\",\n        \"status\": \"DRAFT\",\n        \"totalAmount\": 120000,\n        \"items\": [\n            {\n                \"id\": 1,\n                \"variantId\": 1,\n                \"productName\": \"Premium Linen Shirt\",\n                \"variantDetails\": \"SmartWave Luxe - Ocean Blue - L\",\n                \"quantity\": 50,\n                \"unitPrice\": 2400,\n                \"subtotal\": 120000\n            }\n        ]\n    },\n    \"timestamp\": \"2026-04-18T21:09:53.2281636\"\n}"
+						}
+					]
+				},
+				{
+					"name": "get all purchase orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/procurement"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/procurement"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:40:59 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Purchase Orders retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"supplierName\": \"Global Tech Industries\",\n            \"createdByFullName\": \"System Administrator\",\n            \"approvedByFullName\": null,\n            \"poDate\": \"2026-04-18T21:09:49.246701\",\n            \"status\": \"DRAFT\",\n            \"totalAmount\": 120000,\n            \"items\": [\n                {\n                    \"id\": 1,\n                    \"variantId\": 1,\n                    \"productName\": \"Premium Linen Shirt\",\n                    \"variantDetails\": \"SmartWave Luxe - Ocean Blue - L\",\n                    \"quantity\": 50,\n                    \"unitPrice\": 2400,\n                    \"subtotal\": 120000\n                }\n            ]\n        }\n    ],\n    \"timestamp\": \"2026-04-18T21:10:59.6062369\"\n}"
+						}
+					]
+				},
+				{
+					"name": "get purchase order by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/procurement/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/procurement/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:41:46 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Purchase Order retrieved successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"supplierName\": \"Global Tech Industries\",\n        \"createdByFullName\": \"System Administrator\",\n        \"approvedByFullName\": null,\n        \"poDate\": \"2026-04-18T21:09:49.246701\",\n        \"status\": \"DRAFT\",\n        \"totalAmount\": 120000,\n        \"items\": [\n            {\n                \"id\": 1,\n                \"variantId\": 1,\n                \"productName\": \"Premium Linen Shirt\",\n                \"variantDetails\": \"SmartWave Luxe - Ocean Blue - L\",\n                \"quantity\": 50,\n                \"unitPrice\": 2400,\n                \"subtotal\": 120000\n            }\n        ]\n    },\n    \"timestamp\": \"2026-04-18T21:11:46.9240252\"\n}"
+						}
+					]
+				},
+				{
+					"name": "update purchase order status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/procurement/1/status?status=APPROVED",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"procurement",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "APPROVED"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/api/procurement/1/status?status=APPROVED",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"api",
+										"procurement",
+										"1",
+										"status"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "APPROVED"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:42:32 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Purchase Order status updated to APPROVED\",\n    \"data\": {\n        \"id\": 1,\n        \"supplierName\": \"Global Tech Industries\",\n        \"createdByFullName\": \"System Administrator\",\n        \"approvedByFullName\": \"System Administrator\",\n        \"poDate\": \"2026-04-18T21:09:49.246701\",\n        \"status\": \"APPROVED\",\n        \"totalAmount\": 120000,\n        \"items\": [\n            {\n                \"id\": 1,\n                \"variantId\": 1,\n                \"productName\": \"Premium Linen Shirt\",\n                \"variantDetails\": \"SmartWave Luxe - Ocean Blue - L\",\n                \"quantity\": 50,\n                \"unitPrice\": 2400,\n                \"subtotal\": 120000\n            }\n        ]\n    },\n    \"timestamp\": \"2026-04-18T21:12:32.8620767\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete purchase order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{BASE_URL}}/api/procurement/5"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{BASE_URL}}/api/procurement/5"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 12:35:38 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Purchase Order deleted successfully\",\n    \"data\": null,\n    \"timestamp\": \"2026-04-18T18:05:38.2304516\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "get all products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:09:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"productName\": \"Premium Linen Shirt\",\n        \"category\": \"Gents Wear\",\n        \"variants\": [\n            {\n                \"id\": 1,\n                \"brand\": \"SmartWave Luxe\",\n                \"barcode\": \"LNN-BLU-LRG-01\",\n                \"size\": \"L\",\n                \"color\": \"Ocean Blue\",\n                \"purchasePrice\": 2500,\n                \"sellingPrice\": 4200,\n                \"status\": \"ACTIVE\",\n                \"quantity\": 5\n            }\n        ]\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "get product by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:09:21 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"productName\": \"Premium Linen Shirt\",\n    \"category\": \"Gents Wear\",\n    \"variants\": [\n        {\n            \"id\": 1,\n            \"brand\": \"SmartWave Luxe\",\n            \"barcode\": \"LNN-BLU-LRG-01\",\n            \"size\": \"L\",\n            \"color\": \"Ocean Blue\",\n            \"purchasePrice\": 2500,\n            \"sellingPrice\": 4200,\n            \"status\": \"ACTIVE\",\n            \"quantity\": 5\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "get product variant by barcode",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products/variants/barcode/LNN-BLU-LRG-01"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products/variants/barcode/LNN-BLU-LRG-01"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:20:01 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"productName\": \"Premium Linen Shirt\",\n    \"category\": \"Gents Wear\",\n    \"brand\": \"SmartWave Luxe\",\n    \"barcode\": \"LNN-BLU-LRG-01\",\n    \"size\": \"L\",\n    \"color\": \"Ocean Blue\",\n    \"purchasePrice\": 2500,\n    \"sellingPrice\": 4200,\n    \"status\": \"ACTIVE\",\n    \"quantity\": 5\n}"
+						}
+					]
+				},
+				{
+					"name": "get product variant by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products/variants/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products/variants/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:52:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"productName\": \"Premium Linen Shirt\",\n    \"category\": \"Gents Wear\",\n    \"brand\": \"SmartWave Luxe\",\n    \"barcode\": \"LNN-BLU-LRG-01\",\n    \"size\": \"L\",\n    \"color\": \"Ocean Blue\",\n    \"purchasePrice\": 2500,\n    \"sellingPrice\": 4200,\n    \"status\": \"ACTIVE\",\n    \"quantity\": 5\n}"
+						}
+					]
+				},
+				{
+					"name": "create product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productName\": \"Premium Linen Shirt\",\r\n  \"category\": \"Gents Wear\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/inventory/products"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productName\": \"Premium Linen Shirt\",\r\n  \"category\": \"Gents Wear\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/inventory/products"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:04:36 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"productName\": \"Premium Linen Shirt\",\n    \"category\": \"Gents Wear\",\n    \"variants\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "create product varient",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"barcode\": \"LNN-BLU-LRG-01\",\r\n  \"brand\": \"SmartWave Luxe\",\r\n  \"size\": \"L\",\r\n  \"color\": \"Ocean Blue\",\r\n  \"purchasePrice\": 2500.0,\r\n  \"sellingPrice\": 4200.0,\r\n  \"quantity\": 5,\r\n  \"status\": \"ACTIVE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/inventory/products/1/variants"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"barcode\": \"LNN-BLU-LRG-01\",\r\n  \"brand\": \"SmartWave Luxe\",\r\n  \"size\": \"L\",\r\n  \"color\": \"Ocean Blue\",\r\n  \"purchasePrice\": 2500.0,\r\n  \"sellingPrice\": 4200.0,\r\n  \"quantity\": 5,\r\n  \"status\": \"ACTIVE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/inventory/products/1/variants"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:08:13 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"brand\": \"SmartWave Luxe\",\n    \"barcode\": \"LNN-BLU-LRG-01\",\n    \"size\": \"L\",\n    \"color\": \"Ocean Blue\",\n    \"purchasePrice\": 2500,\n    \"sellingPrice\": 4200,\n    \"status\": \"ACTIVE\",\n    \"quantity\": 5\n}"
+						}
+					]
+				},
+				{
+					"name": "update product variant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"barcode\": \"LNN-BLU-LRG-01\",\r\n  \"brand\": \"SmartWave Luxe\",\r\n  \"size\": \"XL\",\r\n  \"color\": \"Ocean Blue\",\r\n  \"purchasePrice\": 2500.0,\r\n  \"sellingPrice\": 4200.0,\r\n  \"quantity\": 5,\r\n  \"status\": \"ACTIVE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/inventory/products/variants/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"barcode\": \"LNN-BLU-LRG-01\",\r\n  \"brand\": \"SmartWave Luxe\",\r\n  \"size\": \"XL\",\r\n  \"color\": \"Ocean Blue\",\r\n  \"purchasePrice\": 2500.0,\r\n  \"sellingPrice\": 4200.0,\r\n  \"quantity\": 5,\r\n  \"status\": \"ACTIVE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/inventory/products/variants/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:54:58 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"productName\": \"Premium Linen Shirt\",\n    \"category\": \"Gents Wear\",\n    \"brand\": \"SmartWave Luxe\",\n    \"barcode\": \"LNN-BLU-LRG-01\",\n    \"size\": \"XL\",\n    \"color\": \"Ocean Blue\",\n    \"purchasePrice\": 2500,\n    \"sellingPrice\": 4200,\n    \"status\": \"ACTIVE\",\n    \"quantity\": 5\n}"
+						}
+					]
+				},
+				{
+					"name": "update product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"T-shirt\",\r\n    \"category\": \"men\",\r\n    \"brand\": \"nike\",\r\n    \"size\": \"L\",\r\n    \"color\": \"red\",\r\n    \"barcode\": \"TSH-HJT-01\",\r\n    \"purchasePrice\": 2000.00,\r\n    \"sellingPrice\": 2500.00,\r\n    \"status\": \"AVAILABLE\",\r\n    \"quantity\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/inventory/products/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"T-shirt\",\r\n    \"category\": \"men\",\r\n    \"brand\": \"nike\",\r\n    \"size\": \"L\",\r\n    \"color\": \"red\",\r\n    \"barcode\": \"TSH-HJT-01\",\r\n    \"purchasePrice\": 2000.00,\r\n    \"sellingPrice\": 2500.00,\r\n    \"status\": \"AVAILABLE\",\r\n    \"quantity\": 10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{BASE_URL}}/api/inventory/products/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 12:03:13 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Product updated successfully\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"T-shirt\",\n        \"category\": \"men\",\n        \"brand\": \"nike\",\n        \"size\": \"L\",\n        \"color\": \"red\",\n        \"barcode\": \"TSH-HJT-01\",\n        \"purchasePrice\": 2000,\n        \"sellingPrice\": 2500,\n        \"status\": \"AVAILABLE\",\n        \"quantity\": 10\n    },\n    \"timestamp\": \"2026-04-18T17:33:13.8538142\"\n}"
+						}
+					]
+				},
+				{
+					"name": "delete product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products/1"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products/1"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 12:10:10 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Product deleted successfully\",\n    \"data\": null,\n    \"timestamp\": \"2026-04-18T17:40:10.9368344\"\n}"
+						}
+					]
+				},
+				{
+					"name": "delete product variant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{BASE_URL}}/api/inventory/products/variants/2"
+					},
+					"response": [
+						{
+							"name": "eg",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": "{{BASE_URL}}/api/inventory/products/variants/2"
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 18 Apr 2026 15:57:36 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
