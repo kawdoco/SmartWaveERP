@@ -1,44 +1,40 @@
 package com.smartwave.erp.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Product — Parent entity representing a general textile model.
+ * Contains shared metadata like Name, Category, and the Master Barcode.
+ */
 @Entity
 @Table(name = "products")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String sku;
-    private Double price;
-    private Integer quantity;
 
-    public Product() {}
+    @Column(name = "product_name", nullable = false)
+    private String productName;
 
-    public Product(String name, String sku, Double price, Integer quantity) {
-        this.name = name;
-        this.sku = sku;
-        this.price = price;
-        this.quantity = quantity;
+    private String category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ProductVariant> variants = new ArrayList<>();
+
+    // Helper to add variants
+    public void addVariant(ProductVariant variant) {
+        variants.add(variant);
+        variant.setProduct(this);
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public String getSku() { return sku; }
-    public void setSku(String sku) { this.sku = sku; }
-    
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
-    
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 }

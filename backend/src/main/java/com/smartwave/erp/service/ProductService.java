@@ -1,8 +1,11 @@
 package com.smartwave.erp.service;
 
 import com.smartwave.erp.model.dto.ProductDto;
+import com.smartwave.erp.model.dto.ProductVariantDto;
 import com.smartwave.erp.model.entity.Product;
+import com.smartwave.erp.model.entity.ProductVariant;
 import com.smartwave.erp.repository.ProductRepository;
+import com.smartwave.erp.repository.ProductVariantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,15 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * ProductService — Handles hierarchical inventory with variant-level barcodes.
+ */
 @Service
 @Transactional
+@SuppressWarnings("null")
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductVariantRepository variantRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductVariantRepository variantRepository) {
         this.productRepository = productRepository;
+        this.variantRepository = variantRepository;
     }
 
     public List<ProductDto> getAllProducts() {
@@ -27,24 +36,134 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public ProductDto createProduct(ProductDto productDto) {
-        Product product = new Product(
-                productDto.getName(),
-                productDto.getSku(),
-                productDto.getPrice(),
-                productDto.getQuantity()
-        );
+    public ProductDto getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        return convertToDto(product);
+    }
+
+    @Transactional
+    public ProductDto createProduct(ProductDto dto) {
+        Product product = new Product();
+        product.setProductName(dto.getProductName());
+        product.setCategory(dto.getCategory());
+
+        // Handle initial variants if provided
+        if (dto.getVariants() != null) {
+            for (ProductVariantDto vDto : dto.getVariants()) {
+                ProductVariant variant = new ProductVariant();
+                mapVariantDtoToEntity(vDto, variant);
+                product.addVariant(variant);
+            }
+        }
+
         Product savedProduct = productRepository.save(product);
         return convertToDto(savedProduct);
     }
 
+    @Transactional
+    public ProductDto updateProduct(Long id, ProductDto dto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        product.setProductName(dto.getProductName());
+        product.setCategory(dto.getCategory());
+
+        return convertToDto(productRepository.save(product));
+    }
+
+    @Transactional
+    public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new RuntimeException("Cannot delete: Product not found with id: " + id);
+        }
+        productRepository.deleteById(id);
+    }
+
+    // --- VARIANT MANAGEMENT ---
+
+    @Transactional
+    public ProductVariantDto addVariant(Long productId, ProductVariantDto vDto) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Parent product not found"));
+        
+        ProductVariant variant = new ProductVariant();
+        mapVariantDtoToEntity(vDto, variant);
+        product.addVariant(variant);
+        
+        ProductVariant saved = variantRepository.save(variant);
+        return convertVariantToDto(saved);
+    }
+
+    public ProductVariantDto getVariantByBarcode(String barcode) {
+        ProductVariant variant = variantRepository.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException("Varient not found for barcode: " + barcode));
+        return convertVariantToDto(variant);
+    }
+
+    public ProductVariantDto getVariantById(Long variantId) {
+        ProductVariant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new RuntimeException("Varient not found with id: " + variantId));
+        return convertVariantToDto(variant);
+    }
+
+    @Transactional
+    public ProductVariantDto updateVariant(Long variantId, ProductVariantDto vDto) {
+        ProductVariant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new RuntimeException("Varient not found for update with id: " + variantId));
+        
+        mapVariantDtoToEntity(vDto, variant);
+        ProductVariant saved = variantRepository.save(variant);
+        return convertVariantToDto(saved);
+    }
+
+    @Transactional
+    public void deleteVariant(Long variantId) {
+        if (!variantRepository.existsById(variantId)) {
+            throw new RuntimeException("Cannot delete: Varient not found with id: " + variantId);
+        }
+        variantRepository.deleteById(variantId);
+    }
+
+    // --- MAPPERS ---
+
+    private void mapVariantDtoToEntity(ProductVariantDto dto, ProductVariant entity) {
+        entity.setBrand(dto.getBrand());
+        entity.setBarcode(dto.getBarcode()); // Barcode is now at Variant level
+        entity.setSize(dto.getSize());
+        entity.setColor(dto.getColor());
+        entity.setPurchasePrice(dto.getPurchasePrice());
+        entity.setSellingPrice(dto.getSellingPrice());
+        entity.setQuantity(dto.getQuantity() != null ? dto.getQuantity() : 0);
+        if (dto.getStatus() != null) {
+            entity.setStatus(dto.getStatus());
+        }
+    }
+
     private ProductDto convertToDto(Product product) {
-        ProductDto dto = new ProductDto();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setSku(product.getSku());
-        dto.setPrice(product.getPrice());
-        dto.setQuantity(product.getQuantity());
-        return dto;
+        return ProductDto.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .category(product.getCategory())
+                .variants(product.getVariants().stream()
+                        .map(this::convertVariantToDto)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private ProductVariantDto convertVariantToDto(ProductVariant v) {
+        return ProductVariantDto.builder()
+                .id(v.getId())
+                .productName(v.getProduct() != null ? v.getProduct().getProductName() : null)
+                .category(v.getProduct() != null ? v.getProduct().getCategory() : null)
+                .brand(v.getBrand())
+                .barcode(v.getBarcode())
+                .size(v.getSize())
+                .color(v.getColor())
+                .purchasePrice(v.getPurchasePrice())
+                .sellingPrice(v.getSellingPrice())
+                .status(v.getStatus())
+                .quantity(v.getQuantity())
+                .build();
     }
 }
