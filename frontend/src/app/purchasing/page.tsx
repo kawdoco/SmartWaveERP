@@ -1,7 +1,12 @@
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { Plus, UserPlus } from "lucide-react";
+import CreatePOForm from "../../components/CreatePOForm";
 
 export default function ProcurementPage() {
+  const [isCreatePOOpen, setIsCreatePOOpen] = useState(false);
   const purchaseOrders: {
     id: string;
     supplier: string;
@@ -75,8 +80,8 @@ export default function ProcurementPage() {
             Add Supplier
           </button>
 
-          <Link
-            href="/purchasing/create-po"
+          <button
+            onClick={() => setIsCreatePOOpen(true)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -85,12 +90,14 @@ export default function ProcurementPage() {
               borderRadius: "12px",
               backgroundColor: "#0A2540",
               color: "#FFFFFF",
-              textDecoration: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "16px",
             }}
           >
             <Plus size={18} />
             Create PO
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -214,6 +221,7 @@ export default function ProcurementPage() {
           )}
         </div>
       </div>
+      <CreatePOForm isOpen={isCreatePOOpen} onClose={() => setIsCreatePOOpen(false)} />
     </div>
   );
 }
