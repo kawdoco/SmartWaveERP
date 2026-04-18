@@ -84,6 +84,21 @@ export function clearAuthData(): void {
   localStorage.removeItem('smartwave_user');
 }
 
+/** 
+ * Retrieve the full user object stored after login.
+ * Returns null if the user is not authenticated.
+ */
+export function getStoredUser(): AuthResponse | null {
+  if (typeof window === 'undefined') return null;
+  const userJson = localStorage.getItem('smartwave_user');
+  if (!userJson) return null;
+  try {
+    return JSON.parse(userJson) as AuthResponse;
+  } catch {
+    return null;
+  }
+}
+
 /** Build the Authorization header for protected API calls. */
 function authHeader(): Record<string, string> {
   const token = getStoredToken();

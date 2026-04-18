@@ -32,7 +32,8 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { userApi, authApi, UserDTO } from "@/lib/api"; // CHANGE: real API client
+import { userApi, authApi, UserDTO, getStoredUser } from "@/lib/api"; 
+import { UserTableSkeleton, ButtonSkeleton } from "@/components/Skeleton"; // NEW: Skeleton components
 
 // ── Role constants (mirrors backend Role enum) ────────────────────────────────
 const ROLES = ["ADMIN", "MANAGER", "CASHIER", "INVENTORY_CLERK"] as const;
@@ -68,6 +69,10 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);            // CHANGE: loading state
   const [error, setError] = useState<string | null>(null); // CHANGE: error state
   const [success, setSuccess] = useState<string | null>(null); // CHANGE: success feedback
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null); // NEW: for role gating
+
+  // Check if current user has management permissions
+  const canManage = currentUserRole === "ADMIN" || currentUserRole === "MANAGER";
 
   // Add-user modal state
   const [showModal, setShowModal] = useState(false);
@@ -115,7 +120,12 @@ export default function UsersPage() {
     }
   }, []);
 
-  useEffect(() => { loadUsers(); }, [loadUsers]); // fetch on mount
+  useEffect(() => { 
+    loadUsers(); 
+    // NEW: Get current user role on mount
+    const user = getStoredUser();
+    if (user) setCurrentUserRole(user.role);
+  }, [loadUsers]); // fetch on mount
 
   // ── Filtered list (client-side search against live data) ──────────────────
   const filtered = users.filter((u) => {
@@ -294,7 +304,7 @@ export default function UsersPage() {
     } as React.CSSProperties,
     row: {
       display: "grid",
-      gridTemplateColumns: "2fr 1.2fr 1.2fr 1fr 1.4fr 1fr",
+      gridTemplateColumns: canManage ? "2fr 1.2fr 1.2fr 1fr 1.4fr 1fr" : "2fr 1.2fr 1.2fr 1fr 1.4fr",
       padding: "14px 15px",
       borderTop: "1px solid #F1F5F9",
       alignItems: "center",
@@ -362,9 +372,15 @@ export default function UsersPage() {
           <div style={styles.title}>User Management</div>
           <div style={styles.subtitle}>Manage system access and roles.</div>
         </div>
-        <button style={styles.addButton} onClick={() => setShowModal(true)}>
-          + Add User
-        </button>
+        {currentUserRole === null ? (
+          <ButtonSkeleton width="120px" />
+        ) : (
+          canManage && (
+            <button style={styles.addButton} onClick={() => setShowModal(true)}>
+              + Add User
+            </button>
+          )
+        )}
       </div>
 
       {/* ── Global feedback banners ────────────────────────────────────────── */}
@@ -414,14 +430,12 @@ export default function UsersPage() {
           <div>Email</div>
           <div>Status</div>
           <div>Role</div>
-          <div>Actions</div>
+          {canManage && <div>Actions</div>}
         </div>
 
         {/* ── CHANGE: Loading skeleton ─────────────────────────────────────── */}
         {loading && (
-          <div style={{ padding: "40px", textAlign: "center", color: "#94A3B8", fontSize: "14px" }}>
-            Loading users…
-          </div>
+          <UserTableSkeleton canManage={canManage} rows={6} />
         )}
 
         {/* ── CHANGE: Empty state ────────────────────────────────────────────*/}
@@ -437,6 +451,8 @@ export default function UsersPage() {
             ...styles.row,
             /* dim inactive rows */
             opacity: user.isActive ? 1 : 0.55,
+            /* ADJUST COLUMNS BASED ON PERMISSIONS */
+            gridTemplateColumns: canManage ? "2fr 1.2fr 1.2fr 1fr 1.4fr 1fr" : "2fr 1.2fr 1.2fr 1fr 1.4fr",
           }}>
 
             {/* Full name */}
@@ -451,14 +467,14 @@ export default function UsersPage() {
             {/* Status toggle — CHANGE: clickable button calls toggleStatus API */}
             <div>
               <button
-                onClick={() => handleToggleStatus(user.id)}
-                title="Click to toggle active status"
+                onClick={() => canManage && handleToggleStatus(user.id)}
+                title={canManage ? "Click to toggle active status" : "Status (view-only)"}
                 style={{
                   padding: "4px 10px",
                   borderRadius: "20px",
                   fontSize: "11px",
                   fontWeight: 600,
-                  cursor: "pointer",
+                  cursor: canManage ? "pointer" : "default",
                   border: "none",
                   backgroundColor: user.isActive ? "#D1FAE5" : "#FEE2E2",
                   color: user.isActive ? "#065F46" : "#991B1B",
@@ -472,7 +488,8 @@ export default function UsersPage() {
             <div>
               <select
                 value={user.role}
-                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                onChange={(e) => canManage && handleRoleChange(user.id, e.target.value)}
+                disabled={!canManage}
                 style={{
                   padding: "4px 8px",
                   borderRadius: "8px",
@@ -481,7 +498,8 @@ export default function UsersPage() {
                   backgroundColor: ROLE_COLOURS[user.role]?.bg ?? "#F1F5F9",
                   color: ROLE_COLOURS[user.role]?.text ?? "#334155",
                   fontWeight: 600,
-                  cursor: "pointer",
+                  cursor: canManage ? "pointer" : "default",
+                  appearance: canManage ? "auto" : "none", // hide arrow if read-only
                 }}
               >
                 {ROLES.map((r) => (
@@ -490,43 +508,44 @@ export default function UsersPage() {
               </select>
             </div>
 
-            {/* Actions — Edit + Delete */}
-            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            {/* Actions — Edit + Delete (ONLY FOR ADMIN/MANAGER) */}
+            {canManage && (
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {/* Edit button */}
+                <button
+                  onClick={() => openEdit(user)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "7px",
+                    border: "1px solid #BFDBFE",
+                    backgroundColor: "#EFF6FF",
+                    color: "#1D4ED8",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  Edit
+                </button>
 
-              {/* Edit button — opens pre-filled Edit modal */}
-              <button
-                onClick={() => openEdit(user)}
-                style={{
-                  padding: "5px 12px",
-                  borderRadius: "7px",
-                  border: "1px solid #BFDBFE",
-                  backgroundColor: "#EFF6FF",
-                  color: "#1D4ED8",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                Edit
-              </button>
-
-              {/* Delete button */}
-              <button
-                onClick={() => handleDelete(user.id, user.fullName)}
-                style={{
-                  padding: "5px 12px",
-                  borderRadius: "7px",
-                  border: "1px solid #FECACA",
-                  backgroundColor: "#FEF2F2",
-                  color: "#B91C1C",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                Delete
-              </button>
-            </div>
+                {/* Delete button */}
+                <button
+                  onClick={() => handleDelete(user.id, user.fullName)}
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "7px",
+                    border: "1px solid #FECACA",
+                    backgroundColor: "#FEF2F2",
+                    color: "#B91C1C",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

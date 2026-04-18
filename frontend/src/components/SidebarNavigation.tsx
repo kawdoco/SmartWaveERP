@@ -2,7 +2,8 @@
 
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { clearAuthData, getStoredUser } from '@/lib/api'; // CHANGE: getStoredUser helper
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -80,6 +81,20 @@ const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive, isCollap
 
 export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen, isMobileScreen }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [userRole, setUserRole] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const user = getStoredUser();
+    if (user) {
+      setUserRole(user.role);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    clearAuthData();
+    router.push('/login');
+  };
 
   const dashboardIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
   const userIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>;
@@ -89,10 +104,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
   const posIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>;
   const reportsIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>;
   const settingsIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
+  const logoutIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>;
 
   const menuConfig = [
     { label: 'Dashboard', href: '/', icon: dashboardIcon },
-    { label: 'User Management', href: '/user', icon: userIcon },
+    { label: 'User Management', href: '/user', icon: userIcon, roleRestricted: true },
     { label: 'Products', href: '/products', icon: productsIcon },
     { label: 'Procurement', href: '/purchasing', icon: procurementIcon },
     { label: 'Inventory', href: '/inventory', icon: inventoryIcon },
@@ -100,6 +116,14 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
     { label: 'Reports', href: '/reports', icon: reportsIcon },
     { label: 'Settings', href: '/settings', icon: settingsIcon },
   ];
+
+  // CHANGE: Filter menu items based on role
+  const filteredMenu = menuConfig.filter(item => {
+    if (item.roleRestricted) {
+      return userRole === 'ADMIN' || userRole === 'MANAGER';
+    }
+    return true;
+  });
 
   // Dynamic Styles Calculation
   const sidebarWidth = isCollapsed ? '80px' : '260px';
@@ -207,7 +231,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
         paddingTop: '16px',
         paddingBottom: '16px',
       }}>
-        {menuConfig.map((item) => (
+        {filteredMenu.map((item) => (
           <NavItem
             key={item.href}
             label={item.label}
@@ -218,6 +242,45 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
             onClick={() => setIsMobileOpen(false)} 
           />
         ))}
+
+        {/* Logout Action */}
+        <div 
+          onClick={handleLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '12px 16px',
+            margin: '20px 12px 4px',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'all 0.2s ease',
+            justifyContent: effectiveCollapsed ? 'center' : 'flex-start',
+            color: '#dc2626',
+            backgroundColor: 'transparent',
+            borderTop: '1px solid #f1f5f9'
+          }}
+          title={effectiveCollapsed ? 'Logout' : undefined}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#fef2f2';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+            marginRight: effectiveCollapsed ? '0' : '12px',
+          }}>
+            {logoutIcon}
+          </div>
+          {!effectiveCollapsed && (
+            <span style={{ fontSize: '14px', fontWeight: 600 }}>
+              Logout
+            </span>
+          )}
+        </div>
       </nav>
 
       {/* Footer Info */}
