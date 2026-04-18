@@ -10,9 +10,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * User Management Controller
+ *
+ * CHANGE: Removed @CrossOrigin(origins = "http://localhost:3000") annotation.
+ * CORS is now handled globally by WebConfig.java using the ALLOWED_ORIGINS
+ * environment variable, so controller-level annotations are no longer needed
+ * (and having both would cause conflicts).
+ */
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     @Autowired
     private UserService userService;
