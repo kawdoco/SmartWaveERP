@@ -329,4 +329,3 @@ const retryButtonStyle: React.CSSProperties = {
 const loadingContainerStyle: React.CSSProperties = {
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px'
 };
-};

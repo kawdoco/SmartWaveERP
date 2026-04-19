@@ -25,54 +25,7 @@ import {
 
 // --- Sub-Components from Dev Branch ---
 
-const StatCard = ({ 
-  title, 
-  value, 
-  icon: Icon, 
-  colorClass, 
-  iconBg 
-}: { 
-  title: string; 
-  value: string | number; 
-  icon: any; 
-  colorClass: string; 
-  iconBg: string;
-}) => (
-  <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm flex flex-col justify-between min-h-[160px]">
-    <div className="flex justify-between items-start">
-      <div className={`p-3 rounded-2xl ${iconBg}`}>
-        <Icon className={`w-6 h-6 ${colorClass}`} />
-      </div>
-      <span className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mt-1">
-        {title}
-      </span>
-    </div>
-    
-    <div className="flex justify-between items-end mt-4">
-      <span className="text-3xl font-bold text-gray-900">{value}</span>
-      <div className="flex items-center text-emerald-500 font-medium text-sm mb-1">
-        <ArrowUpRight className="w-4 h-4 mr-0.5" />
-        Live
-      </div>
-    </div>
-  </div>
-);
-
-// --- Local Action Card ---
-const ActionCard = ({ title, desc, link, icon }: any) => (
-  <Link href={link} className="no-underline block group">
-    <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm transition-all hover:border-slate-300 hover:shadow-md h-full">
-      <div className="flex justify-between items-center mb-6">
-        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-800 group-hover:bg-slate-800 group-hover:text-white transition-colors">{icon}</div>
-        <ArrowRight size={18} className="text-slate-300 group-hover:text-slate-800 transition-colors" />
-      </div>
-      <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
-      <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
-    </div>
-  </Link>
-);
-
-// --- Reusable Card Component for the Stats (from local head) ---
+// --- StatCard Component ---
 const StatCard = ({ 
   title, 
   value, 
@@ -100,10 +53,24 @@ const StatCard = ({
       <span className="text-4xl font-bold text-gray-900">{value}</span>
       <div className="flex items-center text-emerald-500 font-medium text-sm mb-1">
         <ArrowUpRight className="w-4 h-4 mr-0.5" />
-        12%
+        Live
       </div>
     </div>
   </div>
+);
+
+// --- Local Action Card ---
+const ActionCard = ({ title, desc, link, icon }: any) => (
+  <Link href={link} className="no-underline block group">
+    <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm transition-all hover:border-slate-300 hover:shadow-md h-full">
+      <div className="flex justify-between items-center mb-6">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-800 group-hover:bg-slate-800 group-hover:text-white transition-colors">{icon}</div>
+        <ArrowRight size={18} className="text-slate-300 group-hover:text-slate-800 transition-colors" />
+      </div>
+      <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+      <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
+    </div>
+  </Link>
 );
 
 export default function Home() {
