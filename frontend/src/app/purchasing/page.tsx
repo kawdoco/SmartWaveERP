@@ -313,10 +313,6 @@ const contentContainerStyle: React.CSSProperties = {
   backgroundColor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F1F5F9', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
 };
 
-const tableHeaderStyle: React.CSSProperties = {
-  marginBottom: '24px'
-};
-
 const tableTitleStyle: React.CSSProperties = {
   fontSize: '20px', fontWeight: 700, color: '#0F172A', margin: 0
 };
@@ -332,4 +328,5 @@ const retryButtonStyle: React.CSSProperties = {
 
 const loadingContainerStyle: React.CSSProperties = {
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px'
+};
 };

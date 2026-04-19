@@ -72,6 +72,40 @@ const ActionCard = ({ title, desc, link, icon }: any) => (
   </Link>
 );
 
+// --- Reusable Card Component for the Stats (from local head) ---
+const StatCard = ({ 
+  title, 
+  value, 
+  icon: Icon, 
+  colorClass, 
+  iconBg 
+}: { 
+  title: string; 
+  value: string | number; 
+  icon: any; 
+  colorClass: string; 
+  iconBg: string;
+}) => (
+  <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm flex flex-col justify-between min-h-[160px]">
+    <div className="flex justify-between items-start">
+      <div className={`p-3 rounded-2xl ${iconBg}`}>
+        <Icon className={`w-6 h-6 ${colorClass}`} />
+      </div>
+      <span className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mt-1">
+        {title}
+      </span>
+    </div>
+    
+    <div className="flex justify-between items-end mt-4">
+      <span className="text-4xl font-bold text-gray-900">{value}</span>
+      <div className="flex items-center text-emerald-500 font-medium text-sm mb-1">
+        <ArrowUpRight className="w-4 h-4 mr-0.5" />
+        12%
+      </div>
+    </div>
+  </div>
+);
+
 export default function Home() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -85,6 +119,7 @@ export default function Home() {
     lowStock: 0
   });
 
+  // --- Auth Guard Logic (from dev_copy) ---
   useEffect(() => {
     const token = getStoredToken();
     if (!token) {
@@ -127,6 +162,7 @@ export default function Home() {
 
   if (!isAuthenticated) return null;
 
+  // --- Premium Dashboard UI (from local head) ---
   return (
     <main className="min-h-screen bg-[#F9FAFB] p-8 lg:p-12 font-sans">
       {/* Header Section */}
@@ -152,6 +188,7 @@ export default function Home() {
         <StatCard 
           title="Inventory Worth" 
           value={loading ? "..." : `Rs.${(stats.inventoryValue / 1000).toFixed(1)}k`} 
+
           icon={TrendingUp} 
           colorClass="text-emerald-500" 
           iconBg="bg-emerald-50" 
@@ -159,6 +196,7 @@ export default function Home() {
         <StatCard 
           title="Catalog Models" 
           value={loading ? "..." : stats.totalProducts} 
+
           icon={Box} 
           colorClass="text-blue-500" 
           iconBg="bg-blue-50" 
@@ -166,6 +204,7 @@ export default function Home() {
         <StatCard 
           title="Low Stock Alert" 
           value={loading ? "..." : stats.lowStock} 
+
           icon={AlertTriangle} 
           colorClass="text-orange-500" 
           iconBg="bg-orange-50" 
@@ -173,6 +212,7 @@ export default function Home() {
         <StatCard 
           title="Pending Orders" 
           value={loading ? "..." : stats.pendingProcurement} 
+
           icon={ShoppingCart} 
           colorClass="text-purple-500" 
           iconBg="bg-purple-50" 
@@ -222,6 +262,7 @@ export default function Home() {
           <div className="flex-1 flex flex-col items-center justify-center text-center">
              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4 italic font-serif text-2xl">S</div>
              <p className="text-slate-400 font-medium">Real-time category-wise distribution chart <br/> is currently being mapped to your catalog.</p>
+
           </div>
         </div>
       </div>

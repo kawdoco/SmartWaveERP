@@ -3,21 +3,21 @@
 /**
  * Login Page — /login
  *
- * CHANGES:
- * 1. handleSignIn now calls the real backend via authApi.login()
- *    instead of the old stub that just checked if the fields were non-empty.
- * 2. saveAuthData() stores the JWT + user info to localStorage after success.
- * 3. Added loading and error states so the user gets visual feedback.
- * 4. The root page (/) now redirects here if no token is stored (see page.tsx).
+ * RESOLVED MERGE CONFLICT:
+ * This page now combines the "Real API Integration" from dev_copy
+ * with the "Forgot Password / Reset Mode" UI functionality from dev.
  *
- * UI is intentionally UNCHANGED — same colours, fonts, layout.
+ * 1. Uses authApi.login() for real authentication.
+ * 2. Saves JWT/User info to localStorage on success.
+ * 3. Includes "Forgot Password" toggle which switches the form to reset mode.
+ * 4. Added loading and error states for a premium UX.
  */
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authApi, saveAuthData } from '@/lib/api'; // CHANGE: real API client
+import { authApi, saveAuthData } from '@/lib/api';
 
-// --- Icons (unchanged) ---
+// --- Icons (from local head and dev_copy) ---
 const ShieldIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -31,39 +31,46 @@ const SignIcon = () => (
   </svg>
 );
 
+const MailIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+  </svg>
+);
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
-  // CHANGE: added loading flag to disable the button while the request is in flight
+  const [isResetMode, setIsResetMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // CHANGE: added error state to display backend error messages below the form
   const [error, setError] = useState<string | null>(null);
-
+  
   const router = useRouter();
 
-  /**
-   * CHANGE: handleSignIn was a stub that only checked for non-empty fields.
-   * It now:
-   *  1. Calls POST /auth/login via authApi.login()
-   *  2. On success → saves JWT to localStorage, redirects to "/"
-   *  3. On failure → shows the error message from the backend
+  /** 
+   * Handle the form submission based on current mode (Login vs Reset)
    */
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);       // clear any previous error
-    setIsLoading(true);   // disable the button
-
-    try {
-      const authData = await authApi.login(username, password);
-      saveAuthData(authData); // persist JWT + user info to localStorage
-      router.push('/');       // redirect to the dashboard
-    } catch (err: unknown) {
-      // Show whatever error message the backend returned
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
-    } finally {
-      setIsLoading(false); // re-enable the button regardless of outcome
+    setError(null);
+    
+    if (isResetMode) {
+      // --- Reset Logic (UI only for now) ---
+      console.log("Reset link requested for:", username);
+      alert("If an account exists, a reset link has been sent to your email.");
+      setIsResetMode(false);
+    } else {
+      // --- Real Login Logic (from dev_copy) ---
+      setIsLoading(true);
+      try {
+        const authData = await authApi.login(username, password);
+        saveAuthData(authData);
+        router.push('/');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -90,7 +97,7 @@ export default function LoginPage() {
         border: '1px solid #e2e8f0'
       }}>
         
-        {/* Navy Blue Header Section (unchanged) */}
+        {/* Navy Blue Header Section */}
         <div style={{
           backgroundColor: '#0A2540',
           padding: '48px 24px',
@@ -111,26 +118,27 @@ export default function LoginPage() {
             <ShieldIcon />
           </div>
           <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, letterSpacing: '-0.5px' }}>
-            SmartWave
+            {isResetMode ? 'Reset Password' : 'SmartWave'}
           </h1>
           <p style={{ margin: '8px 0 0', fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)', fontWeight: 500 }}>
-            Secure Module Access
+            {isResetMode ? 'Enter your email/username to recover access' : 'Secure Module Access'}
           </p>
         </div>
 
-        {/* White Form Section (unchanged layout, added error banner + loading state) */}
-        <form onSubmit={handleSignIn} style={{ padding: '40px 32px' }}>
+        {/* Form Section */}
+        <form onSubmit={handleAction} style={{ padding: '40px 32px' }}>
+          
+          {/* Email / Username field */}
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>
-              Username
+              {isResetMode ? 'Email or Username' : 'Username'}
             </label>
             <input 
               type="text" 
-              placeholder="Enter your username"
+              placeholder={isResetMode ? "email@example.com" : "Enter your username"}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              // CHANGE: disabled while loading to prevent double-submit
               disabled={isLoading}
               style={{
                 width: '100%',
@@ -149,35 +157,49 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>
-              Password
-            </label>
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              // CHANGE: disabled while loading
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                borderRadius: '12px',
-                border: '1px solid #cbd5e1',
-                backgroundColor: '#f8fafc',
-                fontSize: '15px',
-                outline: 'none',
-                boxSizing: 'border-box',
-                opacity: isLoading ? 0.7 : 1,
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#0A2540'}
-              onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-            />
-          </div>
+          {/* Password field - Only shown in Login mode */}
+          {!isResetMode && (
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
+                  Password
+                </label>
+                <button 
+                  type="button"
+                  onClick={() => setIsResetMode(true)}
+                  style={{ 
+                    background: 'none', border: 'none', color: '#0A2540', 
+                    fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 
+                  }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+              <input 
+                type="password" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required={!isResetMode}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #cbd5e1',
+                  backgroundColor: '#f8fafc',
+                  fontSize: '15px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  opacity: isLoading ? 0.7 : 1,
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0A2540'}
+                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              />
+            </div>
+          )}
 
-          {/* CHANGE: Error banner — only rendered when there is an error message */}
+          {/* Error banner */}
           {error && (
             <div style={{
               marginBottom: '20px',
@@ -193,7 +215,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Navy Blue Button — CHANGE: shows "Signing in…" text while loading */}
+          {/* Action Button */}
           <button type="submit" disabled={isLoading} style={{
             width: '100%',
             padding: '16px',
@@ -214,7 +236,6 @@ export default function LoginPage() {
           onMouseOver={(e) => { if (!isLoading) e.currentTarget.style.opacity = '0.9'; }}
           onMouseOut={(e) => { if (!isLoading) e.currentTarget.style.opacity = '1'; }}
           >
-            {/* CHANGE: swap the icon for a spinner and change the label when loading */}
             {isLoading ? (
               <>
                 <span style={{
@@ -228,15 +249,31 @@ export default function LoginPage() {
                 Signing in…
               </>
             ) : (
-              <><SignIcon /> Sign In</>
+              isResetMode ? <><MailIcon /> Send Reset Link</> : <><SignIcon /> Sign In</>
             )}
           </button>
+
+          {/* Back to Login link */}
+          {isResetMode && (
+            <button 
+              type="button" 
+              onClick={() => setIsResetMode(false)}
+              style={{
+                width: '100%', marginTop: '16px', background: 'none', border: 'none',
+                color: '#64748b', fontSize: '14px', fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              Back to Login
+            </button>
+          )}
 
           {/* Inline keyframes for the spinner animation */}
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', marginTop: '32px', fontWeight: 500 }}>
-            Contact administrator if you forgot your credentials.
+            {isResetMode 
+              ? "Need more help? Contact technical support."
+              : "Contact administrator if you forgot your credentials."}
           </p>
         </form>
       </div>
