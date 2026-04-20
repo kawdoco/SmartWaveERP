@@ -1,245 +1,331 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, UserPlus } from "lucide-react";
-import CreatePOForm from "../../components/CreatePOForm";
+import { Plus, Users, FileText, Loader2, RefreshCw, TrendingUp } from "lucide-react";
+import { procurementApi, PurchaseOrderResponse, supplierApi, SupplierDTO } from "@/lib/api";
+import PurchaseOrderTable from "@/components/purchasing/PurchaseOrderTable";
+import PurchaseOrderDetailsModal from "@/components/purchasing/PurchaseOrderDetailsModal";
 
+/**
+ * ProcurementPage — The central hub for purchasing operations.
+ * Fetches real-time PO data and provides a high-level overview of the supply chain.
+ */
 export default function ProcurementPage() {
-  const [isCreatePOOpen, setIsCreatePOOpen] = useState(false);
-  const purchaseOrders: {
-    id: string;
-    supplier: string;
-    total: string;
-    status: string;
-    date: string;
-  }[] = [];
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderResponse[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const suppliers: {
-    id: string;
-    name: string;
-  }[] = [];
+  // Filter & Pagination State
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  // Detail Modal State
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrderResponse | null>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [posData, suppliersData] = await Promise.all([
+        procurementApi.getAll(),
+        supplierApi.getAll()
+      ]);
+      setPurchaseOrders(posData);
+      setSuppliers(suppliersData);
+    } catch (err: any) {
+      setError(err.message || "Failed to load procurement data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- LIFECYCLE HANDLERS ---
+  const handleApprove = async (id: number) => {
+    try {
+      await procurementApi.updateStatus(id, "APPROVED");
+      fetchData();
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const handleReceive = async (id: number) => {
+    try {
+      await procurementApi.updateStatus(id, "RECEIVED");
+      fetchData();
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const handleCancel = async (id: number) => {
+    if (confirm("Cancel this Purchase Order?")) {
+      try {
+        await procurementApi.updateStatus(id, "CANCELLED");
+        fetchData();
+      } catch (err: any) { alert(err.message); }
+    }
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await procurementApi.updateStatus(id, "DRAFT");
+      fetchData();
+    } catch (err: any) { alert(err.message); }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Delete this record permanently?")) {
+      try {
+        await procurementApi.delete(id);
+        fetchData();
+      } catch (err: any) { alert(err.message); }
+    }
+  };
+
+  const handleViewDetails = (order: PurchaseOrderResponse) => {
+    setSelectedOrder(order);
+    setIsDetailModalOpen(true);
+  };
+
+  // --- FILTERING & PAGINATION LOGIC ---
+  const filteredOrders = purchaseOrders.filter(po => 
+    statusFilter === "ALL" ? true : po.status.toUpperCase() === statusFilter
+  );
+
+  const totalPages = Math.ceil(filteredOrders.length / pageSize);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Stats calculation
+  const totalInvestment = purchaseOrders.reduce((sum, po) => sum + po.totalAmount, 0);
+  const draftOrders = purchaseOrders.filter(po => po.status === 'DRAFT').length;
+
+  if (loading && purchaseOrders.length === 0) {
+    return (
+      <div style={loadingContainerStyle}>
+        <Loader2 className="animate-spin" size={32} color="#0A2540" />
+        <span style={{ fontWeight: 600, color: '#0A2540' }}>Synchronizing Procurement Module...</span>
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#F8FAFC",
-        padding: "32px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "32px",
-          gap: "20px",
-          flexWrap: "wrap",
-        }}
-      >
+    <div style={pageStyle}>
+      {/* Header Container */}
+      <div style={headerSectionStyle}>
         <div>
-          <h1
-            style={{
-              fontSize: "48px",
-              fontWeight: "700",
-              color: "#0F172A",
-              margin: 0,
-            }}
-          >
-            Procurement
-          </h1>
-
-          <p
-            style={{
-              marginTop: "8px",
-              fontSize: "18px",
-              color: "#64748B",
-            }}
-          >
-            Manage suppliers and purchase orders.
-          </p>
+          <h1 style={titleStyle}>Procurement Dashboard</h1>
+          <p style={subtitleStyle}>Industrial grade supply chain management and purchase order tracking.</p>
         </div>
 
-        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 18px",
-              borderRadius: "12px",
-              border: "1px solid #E2E8F0",
-              backgroundColor: "#FFFFFF",
-              color: "#0F172A",
-              cursor: "pointer",
-            }}
-          >
-            <UserPlus size={18} />
-            Add Supplier
+        <div style={actionButtonGroupStyle}>
+          <button onClick={fetchData} style={secondaryButtonStyle} title="Refresh Data">
+            <RefreshCw size={18} />
           </button>
+          
+          <Link href="/purchasing/suppliers" style={secondaryButtonStyle}>
+            <Users size={18} />
+            <span>Manage Suppliers</span>
+          </Link>
 
-          <button
-            onClick={() => setIsCreatePOOpen(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 18px",
-              borderRadius: "12px",
-              backgroundColor: "#0A2540",
-              color: "#FFFFFF",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "16px",
-            }}
-          >
+          <Link href="/purchasing/create-po" style={primaryButtonStyle}>
             <Plus size={18} />
-            Create PO
-          </button>
+            <span>New Purchase Order</span>
+          </Link>
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr",
-          gap: "24px",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E2E8F0",
-            borderRadius: "20px",
-            padding: "24px",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "22px",
-              fontWeight: "700",
-              color: "#0F172A",
-              marginBottom: "20px",
-            }}
-          >
-            Recent Purchase Orders
-          </h2>
+      {/* Stats Overview */}
+      <div style={statsRowStyle}>
+        <StatCard 
+          icon={<TrendingUp size={24} color="#0A2540" />} 
+          label="Total Procurement Value" 
+          value={`LKR ${totalInvestment.toLocaleString()}`} 
+          accent="#EFF6FF"
+        />
+        <StatCard 
+          icon={<FileText size={24} color="#7C3AED" />} 
+          label="Draft Orders" 
+          value={draftOrders.toString()} 
+          accent="#F5F3FF"
+        />
+        <StatCard 
+          icon={<Users size={24} color="#059669" />} 
+          label="Vetted Suppliers" 
+          value={suppliers.length.toString()} 
+          accent="#ECFDF5"
+        />
+      </div>
 
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid #E2E8F0" }}>
-                <th style={thStyle}>PO ID</th>
-                <th style={thStyle}>Supplier</th>
-                <th style={thStyle}>Total</th>
-                <th style={thStyle}>Status</th>
-                <th style={thStyle}>Date</th>
-                <th style={thStyle}>Actions</th>
-              </tr>
-            </thead>
+      {/* Content Section */}
+      <div style={contentContainerStyle}>
+        {error ? (
+          <div style={errorBannerStyle}>
+            <p><strong>Connection Error:</strong> {error}</p>
+            <button onClick={fetchData} style={retryButtonStyle}>Retry Connection</button>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={tableTitleStyle}>Master Ledger: Purchase Orders</h2>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748B' }}>Filter:</span>
+                <select 
+                  style={{ padding: '8px 12px', borderRadius: '10px', border: '1px solid #E2E8F0', outline: 'none', fontSize: '13px' }}
+                  value={statusFilter}
+                  onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="DRAFT">Draft Only</option>
+                  <option value="APPROVED">Approved Only</option>
+                  <option value="RECEIVED">Received Only</option>
+                  <option value="CANCELLED">Cancelled Only</option>
+                </select>
+              </div>
+            </div>
+            
+            <PurchaseOrderTable 
+              orders={paginatedOrders} 
+              onView={handleViewDetails}
+              onApprove={handleApprove}
+              onReceive={handleReceive}
+              onCancel={handleCancel}
+              onRestore={handleRestore}
+              onDelete={handleDelete}
+            />
 
-            <tbody>
-              {purchaseOrders.length > 0 ? (
-                purchaseOrders.map((po) => (
-                  <tr key={po.id} style={rowStyle}>
-                    <td style={tdStyle}>{po.id}</td>
-                    <td style={tdStyle}>{po.supplier}</td>
-                    <td style={tdStyle}>{po.total}</td>
-                    <td style={tdStyle}>{po.status}</td>
-                    <td style={tdStyle}>{po.date}</td>
-                    <td
-                      style={{
-                        ...tdStyle,
-                        color: "#0A2540",
-                        cursor: "pointer",
-                      }}
-                    >
-                      View
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={6}
+            {/* Pagination Footer */}
+            {totalPages > 1 && (
+              <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
                     style={{
-                      padding: "24px 0",
-                      textAlign: "center",
-                      color: "#64748B",
-                      fontSize: "15px",
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid #E2E8F0',
+                      backgroundColor: currentPage === i + 1 ? '#0A2540' : '#FFFFFF',
+                      color: currentPage === i + 1 ? '#FFFFFF' : '#0A2540',
+                      fontWeight: 600,
+                      cursor: 'pointer'
                     }}
                   >
-                    No purchase orders available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div
-          style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E2E8F0",
-            borderRadius: "20px",
-            padding: "24px",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "22px",
-              fontWeight: "700",
-              color: "#0F172A",
-              marginBottom: "10px",
-            }}
-          >
-            Suppliers
-          </h2>
-
-          {suppliers.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {suppliers.map((supplier) => (
-                <div
-                  key={supplier.id}
-                  style={{
-                    padding: "12px",
-                    border: "1px solid #E2E8F0",
-                    borderRadius: "12px",
-                    color: "#0F172A",
-                    backgroundColor: "#FFFFFF",
-                  }}
-                >
-                  {supplier.name}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: "#64748B" }}>
-              No suppliers added yet.
-            </p>
-          )}
-        </div>
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
-      <CreatePOForm isOpen={isCreatePOOpen} onClose={() => setIsCreatePOOpen(false)} />
+
+      {/* Detail Modal */}
+      <PurchaseOrderDetailsModal 
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        order={selectedOrder}
+      />
     </div>
   );
 }
 
-const thStyle = {
-  textAlign: "left" as const,
-  padding: "12px 0",
-  fontSize: "13px",
-  color: "#64748B",
-  textTransform: "uppercase" as const,
+// Sub-component: StatCard
+function StatCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string, accent: string }) {
+  return (
+    <div style={statCardStyle}>
+      <div style={{ ...iconBoxStyle, backgroundColor: accent }}>
+        {icon}
+      </div>
+      <div>
+        <p style={statLabelStyle}>{label}</p>
+        <p style={statValueStyle}>{value}</p>
+      </div>
+    </div>
+  );
+}
+
+// Styles
+const pageStyle: React.CSSProperties = {
+  minHeight: "100vh",
+  backgroundColor: "#F8FAFC",
+  padding: "40px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const tdStyle = {
-  padding: "14px 0",
-  fontSize: "15px",
-  color: "#0F172A",
+const headerSectionStyle: React.CSSProperties = {
+  display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px'
 };
 
-const rowStyle = {
-  borderBottom: "1px solid #E2E8F0",
+const titleStyle: React.CSSProperties = {
+  fontSize: '32px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.8px'
+};
+
+const subtitleStyle: React.CSSProperties = {
+  color: '#64748B', fontSize: '15px', marginTop: '6px'
+};
+
+const actionButtonGroupStyle: React.CSSProperties = {
+  display: 'flex', gap: '12px'
+};
+
+const primaryButtonStyle: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px',
+  backgroundColor: '#0A2540', color: '#FFFFFF', borderRadius: '12px',
+  border: 'none', fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
+  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px',
+  backgroundColor: '#FFFFFF', color: '#0F172A', borderRadius: '12px',
+  border: '1px solid #E2E8F0', fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
+  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+};
+
+const statsRowStyle: React.CSSProperties = {
+  display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', marginBottom: '40px'
+};
+
+const statCardStyle: React.CSSProperties = {
+  backgroundColor: '#FFFFFF', padding: '32px', borderRadius: '24px',
+  display: 'flex', alignItems: 'center', gap: '24px', border: '1px solid #F1F5F9',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+};
+
+const iconBoxStyle: React.CSSProperties = {
+  width: '64px', height: '64px', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+};
+
+const statLabelStyle: React.CSSProperties = { fontSize: '13px', fontWeight: 600, color: '#64748B', margin: 0 };
+
+const statValueStyle: React.CSSProperties = { fontSize: '24px', fontWeight: 800, color: '#0F172A', marginTop: '4px', margin: 0 };
+
+const contentContainerStyle: React.CSSProperties = {
+  backgroundColor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F1F5F9', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+};
+
+const tableTitleStyle: React.CSSProperties = {
+  fontSize: '20px', fontWeight: 700, color: '#0F172A', margin: 0
+};
+
+const errorBannerStyle: React.CSSProperties = {
+  padding: '32px', textAlign: 'center', color: '#DC2626', backgroundColor: '#FEF2F2', borderRadius: '16px', border: '1px solid #FEE2E2'
+};
+
+const retryButtonStyle: React.CSSProperties = {
+  marginTop: '16px', padding: '8px 24px', borderRadius: '8px', border: '1px solid #DC2626',
+  backgroundColor: '#FFFFFF', color: '#DC2626', fontWeight: 600, cursor: 'pointer'
+};
+
+const loadingContainerStyle: React.CSSProperties = {
+  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: '16px'
 };

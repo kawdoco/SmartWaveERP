@@ -1,134 +1,188 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
-import AddProductModal from '../../components/AddProductModal';
+import React, { useState, useEffect } from "react";
+import { Plus, Search, Package, TrendingUp, AlertTriangle, Loader2 } from "lucide-react";
+import { productApi, ProductDTO } from "@/lib/api";
+import ProductTable from "@/components/products/ProductTable";
+import ProductModal from "@/components/products/ProductModal";
+import ProductVariantModal from "@/components/products/ProductVariantModal";
+import { ProductTableSkeleton } from "@/components/Skeleton";
 
-export default function ProductCatalogPage() {
+// Styling Imports
+import { 
+  pageStyle, 
+  titleStyle 
+} from "@/styles/sharedStyles";
+import {
+  headerSectionStyle,
+  subtitleStyle,
+  addButtonStyle,
+  statsRowStyle,
+  statCardStyle,
+  statLabelStyle,
+  statValueStyle,
+  iconWrapperStyle,
+  tableContainerStyle,
+  searchBarContainerStyle,
+  searchInputStyle
+} from "@/styles/productStyles";
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState<ProductDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Model Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(null);
+
+  // Variant Modal
+  const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<any | null>(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await productApi.getAll();
+      setProducts(data);
+    } catch (err) {
+      console.error("Failed to load inventory:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (product: ProductDTO) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Permanently remove this textile model and all its varients?")) {
+      try {
+        await productApi.delete(id);
+        fetchProducts();
+      } catch (err: any) { alert(err.message); }
+    }
+  };
+
+  const handleAddVariant = (productId: number) => {
+    setSelectedProductId(productId);
+    setSelectedVariant(null);
+    setIsVariantModalOpen(true);
+  };
+
+  const handleEditVariant = (productId: number, variant: any) => {
+    setSelectedProductId(productId);
+    setSelectedVariant(variant);
+    setIsVariantModalOpen(true);
+  };
+
+  const handleDeleteVariant = async (variantId: number) => {
+    if (confirm("Remove this specific stock variant?")) {
+      try {
+        await productApi.deleteVariant(variantId);
+        fetchProducts();
+      } catch (err: any) { alert(err.message); }
+    }
+  };
+
+  const filteredProducts = products.filter(p => {
+    const q = searchQuery.toLowerCase();
+    const matchesModel = (p.productName?.toLowerCase() ?? "").includes(q) ||
+                         (p.category?.toLowerCase() ?? "").includes(q);
+    
+    const matchesVariant = p.variants?.some(v => 
+      (v.barcode?.toLowerCase() ?? "").includes(q) ||
+      (v.brand?.toLowerCase() ?? "").includes(q)
+    );
+
+    return matchesModel || matchesVariant;
+  });
+
+  // Stats
+  const totalStockValue = products.reduce((acc, p) => 
+    acc + (p.variants?.reduce((vAcc, v) => vAcc + (v.quantity * (v.purchasePrice || 0)), 0) || 0), 0
+  );
+  const lowStockCount = products.reduce((acc, p) => 
+    acc + (p.variants?.filter(v => v.quantity < 10).length || 0), 0
+  );
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#F8FAFC",
-        padding: "32px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "40px",
-        }}
-      >
+    <div style={pageStyle}>
+      <div style={headerSectionStyle}>
         <div>
-          <h1
-            style={{
-              fontSize: "32px",
-              fontWeight: "bold",
-              color: "#0F172A",
-              margin: 0,
-            }}
-          >
-            Product Catalog
-          </h1>
-          <p
-            style={{
-              color: "#64748B",
-              fontSize: "16px",
-              marginTop: "8px",
-              marginBottom: 0,
-            }}
-          >
-            Manage your clothing inventory items.
-          </p>
+          <h1 style={titleStyle}>Textile Inventory Dashboard</h1>
+          <h2 style={subtitleStyle}>Manage your hierarchical catalog of models and stock varients.</h2>
         </div>
-        
-        <button
-          onClick={() => setIsModalOpen(true)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            backgroundColor: "#0A2540",
-            color: "#FFFFFF",
-            padding: "16px 24px",
-            borderRadius: "16px",
-            border: "none",
-            fontSize: "18px",
-            cursor: "pointer",
-          }}
-        >
-          <Plus size={20} />
-          Add Product
+        <button onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }} style={addButtonStyle}>
+          <Plus size={18} /> New Model
         </button>
       </div>
 
-      <div
-        style={{
-          backgroundColor: "#FFFFFF",
-          border: "1px solid #E2E8F0",
-          borderRadius: "28px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ padding: "32px", borderBottom: "1px solid #E2E8F0" }}>
-          <div style={{ position: "relative", width: "100%" }}>
-            <div style={{ position: "absolute", left: "20px", top: "50%", transform: "translateY(-50%)", color: "#64748B", display: "flex" }}>
-              <Search size={20} />
-            </div>
-            <input
-              type="text"
-              placeholder="Search by name, barcode or brand..."
-              style={{
-                width: "100%",
-                padding: "16px 20px 16px 52px",
-                fontSize: "18px",
-                borderRadius: "16px",
-                border: "1px solid #1E293B",
-                backgroundColor: "#FFFFFF",
-                color: "#1E293B",
-                outline: "none",
-                boxSizing: "border-box"
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ padding: "0 32px 32px 32px", backgroundColor: "#FFFFFF" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "2fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr",
-              fontSize: "14px",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              color: "#64748B",
-              padding: "24px 0 16px 0",
-              borderBottom: "1px solid #E2E8F0"
-            }}
-          >
-            <p style={{ margin: 0 }}>PRODUCT</p>
-            <p style={{ margin: 0 }}>BARCODE</p>
-            <p style={{ margin: 0 }}>BRAND/CAT</p>
-            <p style={{ margin: 0 }}>SIZE/COLOR</p>
-            <p style={{ margin: 0 }}>PRICE</p>
-            <p style={{ margin: 0 }}>STOCK</p>
-            <p style={{ margin: 0 }}>STATUS</p>
-          </div>
-          
-          {/* Empty state or placeholders can go here */}
-          <div style={{ padding: "48px", textAlign: "center", color: "#94A3B8", fontSize: "16px" }}>
-            No products to display.
-          </div>
-        </div>
+      <div style={statsRowStyle}>
+        <StatCard icon={<Package size={24} color="#0A2540" />} label="Master Models" value={loading ? "..." : products.length.toString()} accent="#EFF6FF" />
+        <StatCard icon={<TrendingUp size={24} color="#059669" />} label="Total Stock Value" value={loading ? "LKR ..." : `LKR ${totalStockValue.toLocaleString()}`} accent="#ECFDF5" />
+        <StatCard icon={<AlertTriangle size={24} color="#EF4444" />} label="Varient Alerts" value={loading ? "..." : lowStockCount.toString()} accent="#FEF2F2" />
       </div>
 
-      <AddProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <div style={tableContainerStyle}>
+        <div style={searchBarContainerStyle}>
+          <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '14px' }} />
+          <input 
+            style={searchInputStyle} 
+            placeholder="Search by Varient Barcode, Name or Category..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {loading ? (
+             <ProductTableSkeleton rows={5} />
+        ) : (
+            <ProductTable 
+               products={filteredProducts} 
+               onEdit={handleEdit} 
+               onDelete={handleDelete} 
+               onAddVariant={handleAddVariant}
+               onEditVariant={handleEditVariant}
+               onDeleteVariant={handleDeleteVariant}
+            />
+        )}
+      </div>
+
+      <ProductModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={fetchProducts} 
+        product={selectedProduct} 
+      />
+
+      <ProductVariantModal 
+        isOpen={isVariantModalOpen}
+        onClose={() => setIsVariantModalOpen(false)}
+        onSuccess={fetchProducts}
+        productId={selectedProductId}
+        variant={selectedVariant}
+      />
     </div>
   );
 }
+
+function StatCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string, accent: string }) {
+  return (
+    <div style={{ ...statCardStyle }}>
+      <div style={{ ...iconWrapperStyle, backgroundColor: accent }}>{icon}</div>
+      <div>
+        <p style={statLabelStyle}>{label}</p>
+        <p style={statValueStyle}>{value}</p>
+      </div>
+    </div>
+  );
+}
+

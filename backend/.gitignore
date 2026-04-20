@@ -41,3 +41,7 @@ mvnw.cmd
 *.log
 logs/
 application-local.properties
+
+### Environment Variables (never commit secrets) ###
+.env
+.env.*

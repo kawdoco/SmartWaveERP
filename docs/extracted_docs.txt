@@ -1,0 +1,311 @@
+--- Extracting ER for warehouse system management .drawio (4).pdf ---
+User
+PK user_id
+full_name
+username
+password
+role_id(FK)
+email
+contact_no
+statusER DIAGRAM  FOR W AREHOUSE MANAGEMENT  SYATEM
+Supplier
+PK supplier_id
+f]supplier_name
+contactct_person
+phone
+address
+email
+bank_details
+statusProduct
+PK product_id
+product_name
+category
+brand
+size
+color
+barcode
+purchase_price
+selling_price
+statusPurchase_Order
+PK po_id
+supplier_id(FK)
+created_by(FK)
+approved_by(FK)
+po_date
+status
+total_amount
+Purchase Order Item
+PK po_item_id
+po_id (FK)
+product_id(FK)
+quantity
+unit_price
+subtotal
+Goods Receipt
+PK grn_id
+po_id  (FK)
+received_by (FK)
+received_date
+status
+Goods Receipt_Item
+PK grn_item_id
+grn_id  (FK)
+product_id (FK)
+received_date
+barcodeInventory/Stock
+PK inventory_id
+product_id (FK)
+location_id(FK)
+quantity_on_hand
+last_updated
+Location(Branch/Store)
+PK location_id
+location_name
+addressSales Payment Receipt
+PK receipt_id
+receipt_id(FK)
+cashier_id(FK)
+total_amount
+discount
+payment_method
+status
+Sales Receipt Item
+PK receipt_item_id
+receipt_id(FK)
+product_id(FK)
+quantity
+unit_price
+subtotal
+Payment
+PK payment_id
+invoice_id(FK)
+payment
+payment_method
+amount1 M
+1
+M1
+M1
+M1
+M1
+M1
+MMM
+1M1M1 1
+M1M
+M
+1Belongs1M
+Role
+PK role_id
+name
+--- End of ER for warehouse system management .drawio (4).pdf ---
+
+--- Extracting ERD Entities & Attributes.pdf ---
+ERP Entities & Attributes  
+1. User  
+(For Admin, Procurement Officer, Store Keeper, Cashier)  
+• user_id (PK)  
+• full_name  
+• username  
+• password  
+• role_id (FK)  
+• email  
+• contact_no  
+• status  
+ 
+2. Supplier  
+• supplier_id (PK)  
+• supplier_name  
+• contact_person  
+• phone  
+• email  
+• address  
+• bank_details  
+• status  
+ 
+3. Product  
+• product_id (PK)  
+• product_name  
+• category  
+• brand  
+• size  
+• color  
+• barcode  
+• purchase_price  
+• selling_price  
+• status  
+ 
+4. Purchase Order  
+• po_id (PK)  
+• supplier_id (FK)  
+• created_by (FK → User)  
+• approved_by (FK → User)  
+• po_date  
+• status (Pending / Approved / Sent)  
+• total_amount  
+ 
+5. Purchase Order Item  
+• po_item_id (PK)  
+• po_id (FK)  
+• product_id (FK)  
+• quantity  
+• unit_price  
+• subtotal  
+ 
+6. Goods Receipt  
+• grn_id (PK)  
+• po_id (FK)  
+• received_by (FK → User)  
+• received_date  
+• status  
+ 
+7. Goods Receipt Item  
+• grn_item_id (PK)  
+• grn_id (FK)  
+• product_id (FK)  
+• received_qty  
+• barcode  
+ 
+8. Inventory / Stock  
+• inventory_id (PK)  
+• product_id (FK)  
+• location_id (FK)  
+• quantity_on_hand  
+• last_updated  
+ 
+9. Location (Branch / Store)  
+• location_id (PK)  
+• location_name  
+• address  
+ 
+ 
+ 
+ 
+ 
+ 
+10. Customer  
+ 
+11. Sales Payment Receipt  
+ 
+• Receipt_id (PK)  
+• Receipt _date  
+• cashier_id (FK → User)  
+• total_amount  
+• discount  
+• payment_method  
+• status  
+ 
+12. Sales Receipt Item  
+• Receipt _item_id (PK)  
+• Receipt _id (FK)  
+• product_id (FK)  
+• quantity  
+• unit_price  
+• subtotal  
+ 
+13. Payment  
+• payment_id (PK)  
+• invoice_id (FK)  
+• payment_date  
+• payment_method (Cash/Card)  
+• amount
+--- End of ERD Entities & Attributes.pdf ---
+
+--- Extracting Implementation Plan.pdf ---
+Implementation Plan  
+Smart Wave ERP  
+ 
+• Tech Stacks  
+o Front End – React Next.js with TypeScript  
+o Backend – SpringBoot  
+o Database – PostgreSQL  
+ 
+• Deployment  
+o Frontend – Vercel  
+o Backend – Railway  
+o Database – Supabase  
+ 
+• Auth - JWT
+--- End of Implementation Plan.pdf ---
+
+--- Extracting Scenario Barcode-Based ERP System.pdf ---
+Barcode -Based ERP System  
+Procurement  Module  
+The Procurement Module manages the purchasing process of clothes  from suppliers. The workflow begins 
+when the Procurement Officer creates a Purchase Order (PO) for required products. Items can be added to 
+the PO either by scanning the product barcode or b y manually selecting them from the product list. After 
+selecting products, the officer enters the purchase quantities and reviews the order details. Once verified, 
+the PO is submitted for approval and then sent to the supplier. After the supplier delivers the goods, the 
+Procurement Officer records the supplier bill in the system. This invoice is generated based on the validated 
+Goods Receipt Note (GRN), ensuring only received items are billed.  
+Functional Requirement  
+• Add, edit , delete  and view suppliers  
+• Create purchase order  
+• Add products to PO via barcode scan or manual selection  
+• Enter purchase quantities  
+• Approve Purchase Orders  
+• View purchase history  
+ 
+Inventory Module  
+The Inventory Module is operated mainly by the  Store Keeper and handles all stock -related 
+activities. Once goods arrive from the supplier, the Store Keeper performs the Goods Receipt Note 
+(GRN) by scanning each product’s barcode to validate received quantities. After successful 
+validation, stock level s are automatically updated in the system. The Store Keeper then manages 
+internal stock operations such as transferring items between locations, performing inventory 
+adjustments for damaged or missing products, and monitoring stock availability. Inventory is 
+maintained by size and brand  to support clothing shop requirements. The Store Keeper can also 
+generate stock reports and review stock history to ensure accurate inventory control.  
+Functional Requirement  
+• Add and edit product details  
+• Scan barcode to receive goods  
+• Validate GRN  
+• Automatic stock updates  
+• Stock transfer between locations  
+• Inventory adjustments  
+• View stock levels  
+• View stock history  
+• Generate stock reports  
+ 
+POS Module (Point of  Sale)  
+The POS Module manages customer sales transactions. The workflow starts when the Cashier 
+scans the barcode of clothes  selected by the customer. The system automatically fetches product 
+information such as name, price, size, and brand . The cashier selects quantities and applies 
+discounts if applicable. The system calculates the total amount aut omatically, and payment is 
+collected via cash or card. After completing the transaction, a sales receipt is generated. The sold 
+quantities are immediately deducted from inventory in real time. If customers return items, the 
+cashier processes r eturns through the POS system, and stock levels are adjusted accordingly. Daily 
+sales closing is performed at the end of each business day.  
+Functional Requirement  
+• Scan product barcode  
+• Auto -fetch product details  
+• Select quantities  
+• Automatic total calculation  
+• Apply discounts  
+• Accept cash and card payments  
+• Generate payment  receipt  
+• Handle product returns
+--- End of Scenario Barcode-Based ERP System.pdf ---
+
+--- Extracting Usecase Diagram.drawio.pdf ---
+Use Case for W arehouse
+Management system
+ActorManage User
+Manage Roles
+Configure System
+View Report
+Manage Products
+Create Purchase Order
+Approve Purchase Order
+Record Supplier InvoiceSend PO to Supplier
+ActorAdmin
+Procurement
+Officer
+Stock AdjustmentStock TransferReceive Goods(scan
+Barcode)
+Generate Stock LevelCheck Stock Level
+Accept PaymentScan Product (Barcode)
+Create Sales Invoice
+Print Receipt
+Return ProductActorActorStore
+Keeper
+Cashier
+--- End of Usecase Diagram.drawio.pdf ---
+

@@ -5,20 +5,17 @@ import com.smartwave.erp.model.entity.Role;
 import com.smartwave.erp.model.entity.User;
 import com.smartwave.erp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings("null")
 public class UserService {
     
     @Autowired
     private UserRepository userRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
     
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()

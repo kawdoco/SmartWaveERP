@@ -2,6 +2,37 @@
 
 import React, { useState, useEffect } from "react";
 
+// Styling Imports
+import { 
+  pageStyle, 
+  containerStyle, 
+  backButtonStyle, 
+  cardStyle, 
+  titleStyle, 
+  errorStyle, 
+  fieldGroupStyle, 
+  labelStyle, 
+  inputStyle 
+} from "@/styles/sharedStyles";
+import {
+  adderSectionStyle,
+  sectionTitleStyle,
+  adderGridStyle,
+  subLabelStyle,
+  addButtonStyle,
+  tableStyle,
+  thRowStyle,
+  thStyle,
+  tdStyle,
+  trStyle,
+  qtyInputStyle,
+  specBadgeStyle,
+  removeButtonStyle,
+  totalRowStyle,
+  footerStyle,
+  submitButtonStyle
+} from "@/styles/procurementStyles";
+
 type Supplier = {
   id: string;
   name: string;
@@ -211,20 +242,6 @@ export default function CreatePOForm({ isOpen, onClose }: CreatePOFormProps) {
             }}
           >
             Cancel
-          </button>
-
-          <button
-            style={{
-              padding: "18px",
-              borderRadius: "16px",
-              backgroundColor: "#0A2540",
-              color: "#FFFFFF",
-              fontSize: "18px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Submit PO
           </button>
         </div>
       </div>
