@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -9,9 +9,10 @@ interface NavItemProps {
   icon: ReactNode;
   href: string;
   isActive: boolean;
+  isCollapsed: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive }) => {
+const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive, isCollapsed }) => {
   return (
     <Link href={href} style={{ textDecoration: 'none' }}>
       <div
@@ -25,22 +26,27 @@ const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive }) => {
           transition: 'all 0.2s ease',
           color: isActive ? '#FFFFFF' : '#64748b',
           backgroundColor: isActive ? '#0A2540' : 'transparent',
+          justifyContent: isCollapsed ? 'center' : 'flex-start'
         }}
+        title={isCollapsed ? label : undefined}
       >
         <div style={{ 
-          marginRight: '12px', 
+          marginRight: isCollapsed ? '0px' : '12px', 
           display: 'flex', 
           alignItems: 'center',
           opacity: isActive ? 1 : 0.7 
         }}>
           {icon}
         </div>
-        <span style={{ 
-          fontSize: '15px', 
-          fontWeight: isActive ? 600 : 500 
-        }}>
-          {label}
-        </span>
+        {!isCollapsed && (
+          <span style={{ 
+            fontSize: '15px', 
+            fontWeight: isActive ? 600 : 500,
+            whiteSpace: 'nowrap'
+          }}>
+            {label}
+          </span>
+        )}
       </div>
     </Link>
   );
@@ -48,6 +54,7 @@ const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive }) => {
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Icon Definitions
   const dashboardIcon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
@@ -72,27 +79,55 @@ const Sidebar: React.FC = () => {
 
   return (
     <div style={{ 
-      width: '260px', 
+      width: isCollapsed ? '80px' : '260px', 
       height: '100vh', 
       backgroundColor: '#FFFFFF', 
       borderRight: '1px solid #e2e8f0', 
       position: 'fixed', 
       display: 'flex', 
       flexDirection: 'column', 
-      fontFamily: 'Inter, system-ui, sans-serif' 
+      fontFamily: 'Inter, system-ui, sans-serif',
+      transition: 'width 0.3s ease'
     }}>
-      {/* Branding */}
-      <div style={{ padding: '32px 24px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>
-          SmartWave
-        </h1>
-        <p style={{ margin: '4px 0 0', fontSize: '11px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-          ERP SYSTEM
-        </p>
+      {/* Branding and Collapse Toggle */}
+      <div style={{ padding: isCollapsed ? '32px 12px' : '32px 24px', display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', transition: 'all 0.3s ease' }}>
+        {!isCollapsed && (
+          <div>
+            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>
+              SmartWave
+            </h1>
+            <p style={{ margin: '4px 0 0', fontSize: '11px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>
+              ERP SYSTEM
+            </p>
+          </div>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#64748b',
+            padding: '8px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 0.2s',
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          {isCollapsed ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          )}
+        </button>
       </div>
 
       {/* Menu List */}
-      <nav style={{ flex: 1, paddingTop: '10px' }}>
+      <nav style={{ flex: 1, paddingTop: '10px', overflowY: 'auto', overflowX: 'hidden' }}>
         {menuConfig.map((item) => (
           <NavItem
             key={item.href}
@@ -100,13 +135,14 @@ const Sidebar: React.FC = () => {
             icon={item.icon}
             href={item.href}
             isActive={pathname === item.href}
+            isCollapsed={isCollapsed}
           />
         ))}
       </nav>
 
       {/* Optional Footer/User Section */}
-      <div style={{ padding: '20px', borderTop: '1px solid #f1f5f9', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>
-        v1.0.0 Stable
+      <div style={{ padding: '20px', borderTop: '1px solid #f1f5f9', fontSize: '12px', color: '#94a3b8', textAlign: 'center', transition: 'opacity 0.3s', opacity: isCollapsed ? 0 : 1, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+        {!isCollapsed && "v1.0.0 Stable"}
       </div>
     </div>
   );
