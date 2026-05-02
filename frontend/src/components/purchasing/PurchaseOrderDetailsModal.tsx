@@ -90,7 +90,7 @@ export default function PurchaseOrderDetailsModal({ isOpen, onClose, order }: PO
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '32px' }}>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ color: '#64748B', fontSize: '14px', fontWeight: 600 }}>Total Order Value</span>
-                <p style={{ fontSize: '28px', fontWeight: 800, color: '#0A2540', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '28px', fontWeight: 800, color: '#1D4ED8', margin: '4px 0 0 0' }}>
                   LKR {order.totalAmount.toLocaleString()}
                 </p>
               </div>
@@ -176,5 +176,5 @@ const footerStyle: React.CSSProperties = {
 };
 
 const doneButtonStyle: React.CSSProperties = {
-  padding: '12px 32px', borderRadius: '12px', border: 'none', backgroundColor: '#0A2540', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer'
+  padding: '12px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1D4ED8, #2563EB)', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.30)', transition: 'all 0.2s'
 };

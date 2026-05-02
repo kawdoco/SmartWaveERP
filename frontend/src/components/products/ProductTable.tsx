@@ -71,7 +71,7 @@ export default function ProductTable({ products, onEdit, onDelete, onAddVariant,
                     </td>
                     <td style={{ ...tdStyle, textAlign: 'right' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                         <button onClick={() => toggleExpand(p.id)} style={{ ...actionButtonStyle, color: '#0A2540', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px' }} title="View Varients">
+                         <button onClick={() => toggleExpand(p.id)} style={{ ...actionButtonStyle, color: '#1D4ED8', backgroundColor: '#EFF6FF', borderColor: '#BFDBFE', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px' }} title="View Varients">
                            <Layers size={16} /> 
                            <span style={{ fontSize: '12px', fontWeight: 700 }}>Options</span>
                          </button>
@@ -87,7 +87,7 @@ export default function ProductTable({ products, onEdit, onDelete, onAddVariant,
                       <td colSpan={6} style={{ padding: '0 0 24px 0' }}>
                         <div style={variantContainerStyle}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#0A2540' }}>Product Specifications</h4>
+                            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#1D4ED8' }}>Product Specifications</h4>
                             <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600 }}>Commercial variants for {p.productName}</span>
                           </div>
                           <table style={variantTableStyle}>
@@ -103,10 +103,10 @@ export default function ProductTable({ products, onEdit, onDelete, onAddVariant,
                             <tbody>
                               {p.variants?.map(v => (
                                 <tr key={v.id} style={vTrStyle}>
-                                  <td style={{ ...vTdStyle, fontWeight: 700, color: '#0A2540' }}>{v.brand}</td>
+                                  <td style={{ ...vTdStyle, fontWeight: 700, color: '#1D4ED8' }}>{v.brand}</td>
                                   <td style={vTdStyle}><span style={specBadgeStyle}>{v.color}</span></td>
                                   <td style={vTdStyle}><span style={{ ...specBadgeStyle, backgroundColor: '#FFFFFF' }}>{v.size}</span></td>
-                                  <td style={{ ...vTdStyle, textAlign: 'right', fontWeight: 800, color: '#0A2540' }}>
+                                  <td style={{ ...vTdStyle, textAlign: 'right', fontWeight: 800, color: '#1D4ED8' }}>
                                     LKR {v.sellingPrice.toLocaleString()}
                                   </td>
                                   {isPrivileged && (

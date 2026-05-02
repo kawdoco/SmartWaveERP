@@ -190,4 +190,4 @@ const labelStyle: React.CSSProperties = { display: 'block', fontSize: '12px', fo
 const inputStyle: React.CSSProperties = { width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '14px', outline: 'none' };
 const errorStyle: React.CSSProperties = { padding: '12px', borderRadius: '12px', backgroundColor: '#FEF2F2', color: '#DC2626', fontSize: '12px', marginBottom: '20px' };
 const footerStyle: React.CSSProperties = { marginTop: '12px' };
-const saveButtonStyle: React.CSSProperties = { width: '100%', padding: '14px', borderRadius: '12px', border: 'none', backgroundColor: '#0A2540', color: '#FFFFFF', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
+const saveButtonStyle: React.CSSProperties = { width: '100%', padding: '14px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1D4ED8, #2563EB)', color: '#FFFFFF', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.30)', transition: 'all 0.2s' };

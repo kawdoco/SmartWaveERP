@@ -4,7 +4,7 @@ import AppLayout from '../components/AppLayout';
 
 export const metadata: Metadata = {
   title: 'SmartWave ERP',
-  description: 'Enterprise Resource Planning System',
+  description: 'Enterprise Resource Planning System for Textile Retailers',
 };
 
 export default function RootLayout({
@@ -14,7 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, backgroundColor: '#f8fafc', color: '#0f172a', fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+      </head>
+      <body>
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

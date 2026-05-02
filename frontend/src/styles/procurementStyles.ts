@@ -16,7 +16,7 @@ export const sectionTitleStyle: CSSProperties = {
   margin: '0 0 24px 0', 
   fontSize: '18px', 
   fontWeight: 800, 
-  color: '#0A2540' 
+  color: '#1D4ED8' 
 };
 
 export const adderGridStyle: CSSProperties = { 
@@ -38,7 +38,7 @@ export const subLabelStyle: CSSProperties = {
 export const addButtonStyle: CSSProperties = { 
   padding: '0 24px', 
   borderRadius: '14px', 
-  backgroundColor: '#0A2540', 
+  backgroundColor: '#1D4ED8', 
   color: '#FFF', 
   border: 'none', 
   fontWeight: 700, 
@@ -47,7 +47,9 @@ export const addButtonStyle: CSSProperties = {
   display: 'flex', 
   alignItems: 'center', 
   gap: '8px', 
-  fontSize: '13px' 
+  fontSize: '13px',
+  boxShadow: '0 1px 3px rgba(29, 78, 216, 0.25)',
+  transition: 'background-color 0.2s ease'
 };
 
 export const tableStyle: CSSProperties = { 
@@ -123,7 +125,7 @@ export const submitButtonStyle: CSSProperties = {
   width: '100%', 
   padding: '18px', 
   borderRadius: '16px', 
-  backgroundColor: '#0A2540', 
+  backgroundColor: '#1D4ED8', 
   color: '#FFF', 
   fontSize: '18px', 
   fontWeight: 700, 
@@ -133,7 +135,8 @@ export const submitButtonStyle: CSSProperties = {
   alignItems: 'center', 
   justifyContent: 'center', 
   gap: '12px', 
-  transition: 'all 0.2s' 
+  transition: 'all 0.2s',
+  boxShadow: '0 2px 6px rgba(29, 78, 216, 0.3)'
 };
 
 export const loadingStyle: CSSProperties = { 
@@ -143,5 +146,5 @@ export const loadingStyle: CSSProperties = {
   height: '100vh', 
   gap: '12px', 
   fontWeight: 600, 
-  color: '#0A2540' 
+  color: '#1D4ED8' 
 };

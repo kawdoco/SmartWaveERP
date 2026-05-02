@@ -99,7 +99,7 @@ export default function LoginPage() {
         
         {/* Navy Blue Header Section */}
         <div style={{
-          backgroundColor: '#0A2540',
+          background: 'linear-gradient(135deg, #1E40AF 0%, #1D4ED8 50%, #2563EB 100%)',
           padding: '48px 24px',
           textAlign: 'center',
           color: '#FFFFFF'
@@ -168,7 +168,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setIsResetMode(true)}
                   style={{ 
-                    background: 'none', border: 'none', color: '#0A2540', 
+                    background: 'none', border: 'none', color: '#1D4ED8', 
                     fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: 0 
                   }}
                 >
@@ -219,7 +219,7 @@ export default function LoginPage() {
           <button type="submit" disabled={isLoading} style={{
             width: '100%',
             padding: '16px',
-            backgroundColor: '#0A2540',
+            background: isLoading ? '#93C5FD' : 'linear-gradient(135deg, #1D4ED8, #2563EB)',
             color: '#FFFFFF',
             border: 'none',
             borderRadius: '12px',
@@ -230,10 +230,11 @@ export default function LoginPage() {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '12px',
-            transition: 'opacity 0.2s',
-            opacity: isLoading ? 0.75 : 1,
+            transition: 'all 0.2s',
+            opacity: isLoading ? 0.85 : 1,
+            boxShadow: isLoading ? 'none' : '0 4px 12px rgba(29, 78, 216, 0.35)',
           }}
-          onMouseOver={(e) => { if (!isLoading) e.currentTarget.style.opacity = '0.9'; }}
+          onMouseOver={(e) => { if (!isLoading) e.currentTarget.style.opacity = '0.92'; }}
           onMouseOut={(e) => { if (!isLoading) e.currentTarget.style.opacity = '1'; }}
           >
             {isLoading ? (
