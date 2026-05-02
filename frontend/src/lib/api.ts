@@ -476,6 +476,77 @@ export const productApi = {
     });
     if (!res.ok) throw new Error(`Failed to delete variant ${variantId}`);
   },
+
+  /** Bulk upload products and variants */
+  bulkUpload: async (file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE}/api/inventory/products/bulk-upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${getStoredToken()}`,
+      },
+      body: formData,
+    });
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => ({}));
+      throw new Error(errorBody.message ?? `Bulk upload failed (${res.status})`);
+    }
+  },
+};
+
+// ----------------------------------------------------------------
+// POS API
+// ----------------------------------------------------------------
+export interface CreateSaleRequest {
+  discount: number;
+  paymentMethod: string;
+  items: {
+    variantId: number;
+    quantity: number;
+    unitPrice: number;
+  }[];
+}
+
+export interface SaleDto {
+  id: number;
+  saleDate: string;
+  cashierName: string;
+  subtotal: number;
+  discount: number;
+  totalAmount: number;
+  paymentMethod: string;
+  items: any[];
+}
+
+export const posApi = {
+  createSale: async (payload: CreateSaleRequest): Promise<SaleDto> => {
+    const res = await fetch(`${API_BASE}/api/pos/sale`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader(),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.message ?? `Failed to create sale (${res.status})`);
+    }
+    return res.json();
+  },
+
+  getAllSales: async (): Promise<SaleDto[]> => {
+    const res = await fetch(`${API_BASE}/api/pos/sales`, {
+      headers: { ...authHeader() },
+    });
+    if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.message ?? `Failed to fetch sales (${res.status})`);
+    }
+    return res.json();
+  }
 };
 
 // ----------------------------------------------------------------

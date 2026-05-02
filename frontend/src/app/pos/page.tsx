@@ -18,7 +18,7 @@ import {
   Loader2,
   Clock
 } from 'lucide-react';
-import { productApi, getStoredUser, AuthResponse, ProductVariantDTO } from '@/lib/api';
+import { productApi, posApi, getStoredUser, AuthResponse, ProductVariantDTO, ProductDTO } from '@/lib/api';
 
 // --- Types ---
 interface CartItem {
@@ -38,6 +38,9 @@ const POSInterface = () => {
   const [barcodeInput, setBarcodeInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [allProducts, setAllProducts] = useState<ProductDTO[]>([]);
+  const [searchResults, setSearchResults] = useState<{product: ProductDTO, variant: ProductVariantDTO}[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [discount, setDiscount] = useState<number>(0);
   
   const [activeModal, setActiveModal] = useState<'none' | 'cash' | 'card'>('none');
@@ -54,6 +57,10 @@ const POSInterface = () => {
   useEffect(() => {
     setCurrentUser(getStoredUser());
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    
+    // Fetch all products for autocomplete
+    productApi.getAll().then(setAllProducts).catch(console.error);
+
     return () => clearInterval(timer);
   }, []);
 
@@ -79,19 +86,35 @@ const POSInterface = () => {
   };
 
   // --- Handlers ---
-  const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
-    if ('key' in e && e.key !== 'Enter') return;
-    e.preventDefault();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setBarcodeInput(val);
     
-    if (!barcodeInput.trim()) return;
-
-    setIsSearching(true);
-    setSearchError(null);
-
-    try {
-      const variant = await productApi.getVariantByBarcode(barcodeInput.trim());
+    if (val.trim().length > 0) {
+      const q = val.toLowerCase();
+      const results: {product: ProductDTO, variant: ProductVariantDTO}[] = [];
       
-      // Check if already in cart
+      for (const p of allProducts) {
+        if (!p.variants) continue;
+        for (const v of p.variants) {
+          if (
+            v.barcode?.toLowerCase().includes(q) ||
+            p.productName?.toLowerCase().includes(q) ||
+            v.brand?.toLowerCase().includes(q)
+          ) {
+            results.push({ product: p, variant: v });
+          }
+        }
+      }
+      setSearchResults(results.slice(0, 10)); // Limit to top 10
+      setShowDropdown(true);
+    } else {
+      setSearchResults([]);
+      setShowDropdown(false);
+    }
+  };
+
+  const addToCart = (product: ProductDTO, variant: ProductVariantDTO) => {
       const existingItemIndex = cartItems.findIndex(item => item.variantId === variant.id);
       
       if (existingItemIndex >= 0) {
@@ -99,12 +122,10 @@ const POSInterface = () => {
         newItems[existingItemIndex].quantity += 1;
         setCartItems(newItems);
       } else {
-        // We don't have the parent product name in variant DTO easily without another call, 
-        // so we'll use a placeholder or brand+color if name is missing from the API response
         setCartItems([{
           variantId: variant.id,
           barcode: variant.barcode,
-          productName: `Product #${variant.id}`, // Ideal: fetch product details or update API
+          productName: product.productName,
           brand: variant.brand,
           size: variant.size,
           color: variant.color,
@@ -113,6 +134,29 @@ const POSInterface = () => {
         }, ...cartItems]);
       }
       setBarcodeInput('');
+      setShowDropdown(false);
+      barcodeInputRef.current?.focus();
+  };
+
+  const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
+    if ('key' in e && e.key !== 'Enter') return;
+    e.preventDefault();
+    
+    if (!barcodeInput.trim()) return;
+
+    // Check if there is an exact match in the local results
+    const exactMatch = searchResults.find(res => res.variant.barcode === barcodeInput.trim());
+    if (exactMatch) {
+      addToCart(exactMatch.product, exactMatch.variant);
+      return;
+    }
+
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const variant = await productApi.getVariantByBarcode(barcodeInput.trim());
+      addToCart({ id: 0, productName: `Product #${variant.id}`, category: 'Unknown', variants: [] }, variant);
     } catch (err: any) {
       setSearchError('Product not found');
       setTimeout(() => setSearchError(null), 3000);
@@ -144,11 +188,23 @@ const POSInterface = () => {
   };
 
   const handleCompleteSale = async (method: 'CASH' | 'CARD') => {
-    // TODO: Connect to backend when POS endpoint is ready.
-    // Example: await posApi.createSale({ items: cartItems, discount, paymentMethod: method });
-    
-    setActiveModal('none');
-    setSaleSuccess(true);
+    try {
+      const payload = {
+        discount: discount || 0,
+        paymentMethod: method,
+        items: cartItems.map(item => ({
+          variantId: item.variantId,
+          quantity: item.quantity,
+          unitPrice: item.sellingPrice
+        }))
+      };
+      
+      await posApi.createSale(payload);
+      setActiveModal('none');
+      setSaleSuccess(true);
+    } catch (err: any) {
+      alert("Sale failed: " + err.message);
+    }
   };
 
   const handleNewSale = () => {
@@ -180,7 +236,7 @@ const POSInterface = () => {
         <div className="lg:col-span-2 space-y-4 flex flex-col h-full">
           
           {/* Search Bar */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative z-10">
             <div className="absolute inset-y-0 left-6 flex items-center text-slate-400">
               {isSearching ? <Loader2 size={20} className="animate-spin text-[#1D4ED8]" /> : <Search size={20} />}
             </div>
@@ -188,9 +244,11 @@ const POSInterface = () => {
               ref={barcodeInputRef}
               type="text" 
               value={barcodeInput}
-              onChange={(e) => setBarcodeInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleBarcodeSubmit}
-              placeholder="Scan barcode or type and press Enter..." 
+              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              onFocus={() => { if(searchResults.length > 0) setShowDropdown(true); }}
+              placeholder="Search by name, brand, or scan barcode..." 
               className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-lg transition-all`}
               autoFocus
             />
@@ -198,6 +256,33 @@ const POSInterface = () => {
               <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500 bg-red-50 px-2 py-1 rounded">
                 {searchError}
               </span>
+            )}
+            
+            {/* Dropdown */}
+            {showDropdown && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-80 overflow-y-auto">
+                {searchResults.map((res, idx) => (
+                  <div 
+                    key={`${res.product.id}-${res.variant.id}-${idx}`}
+                    onMouseDown={() => addToCart(res.product, res.variant)}
+                    className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer flex justify-between items-center transition-colors"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-800">{res.product.productName}</div>
+                      <div className="text-xs text-slate-500 flex gap-2 mt-0.5">
+                        <span className="bg-slate-100 px-1.5 rounded text-slate-700 font-bold">{res.variant.barcode}</span>
+                        {res.variant.brand && <span>• {res.variant.brand}</span>}
+                        {res.variant.size && <span>• Size {res.variant.size}</span>}
+                        {res.variant.color && <span>• {res.variant.color}</span>}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-black text-[#1D4ED8]">{formatLKR(res.variant.sellingPrice)}</div>
+                      <div className="text-[10px] text-slate-400 font-bold">{res.variant.quantity} in stock</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

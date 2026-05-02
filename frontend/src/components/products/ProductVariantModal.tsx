@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Loader2, Save, ShoppingBag, ShieldCheck, ShieldAlert } from "lucide-react";
+import { X, Loader2, Save, ShoppingBag, ShieldCheck, ShieldAlert, Wand2 } from "lucide-react";
 import { ProductVariantDTO, productApi, getStoredUser } from "@/lib/api";
 
 interface VariantModalProps {
@@ -53,6 +53,12 @@ export default function ProductVariantModal({ isOpen, onClose, onSuccess, produc
     }
   }, [variant, isOpen]);
 
+  const generateBarcode = () => {
+    // 12-digit random numerical barcode
+    const newBarcode = Math.floor(Math.random() * 900000000000) + 100000000000;
+    setFormData({ ...formData, barcode: newBarcode.toString() });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productId) return;
@@ -96,14 +102,27 @@ export default function ProductVariantModal({ isOpen, onClose, onSuccess, produc
 
           <div style={fieldGroupStyle}>
             <label style={labelStyle}>Variant Barcode / SKU *</label>
-            <input 
-                required 
-                style={{ ...inputStyle, backgroundColor: !isPrivileged ? '#F8FAFC' : '#FFFFFF' }} 
-                value={formData.barcode} 
-                onChange={e => setFormData({ ...formData, barcode: e.target.value })} 
-                placeholder="Scan or type unique barcode..." 
-                disabled={!isPrivileged}
-            />
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                  required 
+                  type="number"
+                  style={{ ...inputStyle, backgroundColor: !isPrivileged ? '#F8FAFC' : '#FFFFFF', flex: 1 }} 
+                  value={formData.barcode} 
+                  onChange={e => setFormData({ ...formData, barcode: e.target.value.replace(/\D/g, '') })} 
+                  placeholder="Scan or type numerical barcode..." 
+                  disabled={!isPrivileged}
+              />
+              {isPrivileged && (
+                <button 
+                  type="button" 
+                  onClick={generateBarcode}
+                  style={{ padding: '0 16px', borderRadius: '12px', border: '1px solid #1D4ED8', backgroundColor: '#EFF6FF', color: '#1D4ED8', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                  title="Auto-Generate Barcode"
+                >
+                  <Wand2 size={18} />
+                </button>
+              )}
+            </div>
           </div>
 
           <div style={rowStyle}>
