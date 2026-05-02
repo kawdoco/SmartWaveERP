@@ -29,21 +29,21 @@ const NavItem: React.FC<NavItemProps> = ({ label, icon, href, isActive, isCollap
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '12px 16px',
-          margin: '4px 12px',
+          padding: '10px 16px',
+          margin: '3px 10px',
           cursor: 'pointer',
-          borderRadius: '8px',
-          transition: 'all 0.2s ease',
+          borderRadius: '10px',
+          transition: 'all 0.15s ease',
           justifyContent: isCollapsed ? 'center' : 'flex-start',
           color: isActive ? '#FFFFFF' : '#64748b',
-          backgroundColor: isActive ? '#1e293b' : 'transparent',
-          boxShadow: isActive ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+          backgroundColor: isActive ? '#1D4ED8' : 'transparent',
+          boxShadow: isActive ? '0 2px 8px rgba(29, 78, 216, 0.30)' : 'none'
         }}
         title={isCollapsed ? label : undefined}
         onMouseOver={(e) => {
           if (!isActive) {
-            e.currentTarget.style.backgroundColor = '#f1f5f9';
-            e.currentTarget.style.color = '#0f172a';
+            e.currentTarget.style.backgroundColor = '#EFF6FF';
+            e.currentTarget.style.color = '#1D4ED8';
           }
         }}
         onMouseOut={(e) => {
@@ -166,10 +166,10 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
       }}>
         {!effectiveCollapsed && (
           <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#1D4ED8', letterSpacing: '-0.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               SmartWave
             </h1>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               ERP System
             </span>
           </div>
@@ -191,7 +191,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, set
               borderRadius: '50%',
               transition: 'background-color 0.2s, color 0.2s',
             }}
-            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#EFF6FF'; e.currentTarget.style.color = '#1D4ED8'; }}
             onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#94a3b8'; }}
             aria-label="Toggle sidebar"
           >

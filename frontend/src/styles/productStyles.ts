@@ -22,12 +22,14 @@ export const addButtonStyle: CSSProperties = {
   alignItems: 'center', 
   gap: '8px', 
   padding: '14px 28px', 
-  backgroundColor: '#0A2540', 
+  backgroundColor: '#1D4ED8', 
   color: '#FFFFFF', 
   borderRadius: '14px', 
   border: 'none', 
   fontWeight: 700, 
-  cursor: 'pointer' 
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease',
+  boxShadow: '0 1px 3px rgba(29, 78, 216, 0.25)'
 };
 
 export const statsRowStyle: CSSProperties = { 

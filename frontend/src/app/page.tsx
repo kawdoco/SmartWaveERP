@@ -39,7 +39,7 @@ const StatCard = ({
   colorClass: string; 
   iconBg: string;
 }) => (
-  <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm flex flex-col justify-between min-h-[160px]">
+    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm flex flex-col justify-between min-h-[160px] hover:border-blue-200 hover:shadow-md transition-all">
     <div className="flex justify-between items-start">
       <div className={`p-3 rounded-2xl ${iconBg}`}>
         <Icon className={`w-6 h-6 ${colorClass}`} />
@@ -51,7 +51,7 @@ const StatCard = ({
     
     <div className="flex justify-between items-end mt-4">
       <span className="text-4xl font-bold text-gray-900">{value}</span>
-      <div className="flex items-center text-emerald-500 font-medium text-sm mb-1">
+      <div className="flex items-center text-blue-600 font-medium text-sm mb-1">
         <ArrowUpRight className="w-4 h-4 mr-0.5" />
         Live
       </div>
@@ -62,10 +62,10 @@ const StatCard = ({
 // --- Local Action Card ---
 const ActionCard = ({ title, desc, link, icon }: any) => (
   <Link href={link} className="no-underline block group">
-    <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm transition-all hover:border-slate-300 hover:shadow-md h-full">
+    <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm transition-all hover:border-blue-300 hover:shadow-md h-full">
       <div className="flex justify-between items-center mb-6">
-        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-800 group-hover:bg-slate-800 group-hover:text-white transition-colors">{icon}</div>
-        <ArrowRight size={18} className="text-slate-300 group-hover:text-slate-800 transition-colors" />
+        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:bg-blue-700 group-hover:text-white transition-colors">{icon}</div>
+        <ArrowRight size={18} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
       </div>
       <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
       <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
@@ -145,7 +145,7 @@ export default function Home() {
             Welcome back, <span className="text-gray-800 font-bold">{user?.fullName || 'System Admin'}</span>. Here's your SmartWave status.
            </p>
         </div>
-        <div className="px-5 py-2 bg-slate-900 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg">
+        <div className="px-5 py-2 bg-blue-700 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg">
             {user?.role || 'Access Granted'}
         </div>
       </header>

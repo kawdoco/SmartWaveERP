@@ -103,7 +103,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-              <span style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b', letterSpacing: '-0.5px' }}>
+              <span style={{ fontSize: '20px', fontWeight: 800, color: '#1D4ED8', letterSpacing: '-0.5px' }}>
                 SmartWave
               </span>
             </div>

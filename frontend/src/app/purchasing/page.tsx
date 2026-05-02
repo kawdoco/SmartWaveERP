@@ -110,8 +110,8 @@ export default function ProcurementPage() {
   if (loading && purchaseOrders.length === 0) {
     return (
       <div style={loadingContainerStyle}>
-        <Loader2 className="animate-spin" size={32} color="#0A2540" />
-        <span style={{ fontWeight: 600, color: '#0A2540' }}>Synchronizing Procurement Module...</span>
+        <Loader2 className="animate-spin" size={32} color="#1D4ED8" />
+        <span style={{ fontWeight: 600, color: '#1D4ED8' }}>Synchronizing Procurement Module...</span>
       </div>
     );
   }
@@ -213,8 +213,8 @@ export default function ProcurementPage() {
                       padding: '8px 14px',
                       borderRadius: '8px',
                       border: '1px solid #E2E8F0',
-                      backgroundColor: currentPage === i + 1 ? '#0A2540' : '#FFFFFF',
-                      color: currentPage === i + 1 ? '#FFFFFF' : '#0A2540',
+                      backgroundColor: currentPage === i + 1 ? '#1D4ED8' : '#FFFFFF',
+                      color: currentPage === i + 1 ? '#FFFFFF' : '#1D4ED8',
                       fontWeight: 600,
                       cursor: 'pointer'
                     }}
@@ -279,9 +279,9 @@ const actionButtonGroupStyle: React.CSSProperties = {
 
 const primaryButtonStyle: React.CSSProperties = {
   display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px',
-  backgroundColor: '#0A2540', color: '#FFFFFF', borderRadius: '12px',
+  background: 'linear-gradient(135deg, #1D4ED8, #2563EB)', color: '#FFFFFF', borderRadius: '12px',
   border: 'none', fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+  boxShadow: '0 4px 12px rgba(29, 78, 216, 0.30)'
 };
 
 const secondaryButtonStyle: React.CSSProperties = {
@@ -322,8 +322,8 @@ const errorBannerStyle: React.CSSProperties = {
 };
 
 const retryButtonStyle: React.CSSProperties = {
-  marginTop: '16px', padding: '8px 24px', borderRadius: '8px', border: '1px solid #DC2626',
-  backgroundColor: '#FFFFFF', color: '#DC2626', fontWeight: 600, cursor: 'pointer'
+  marginTop: '16px', padding: '8px 24px', borderRadius: '8px', border: '1px solid #1D4ED8',
+  backgroundColor: '#FFFFFF', color: '#1D4ED8', fontWeight: 600, cursor: 'pointer'
 };
 
 const loadingContainerStyle: React.CSSProperties = {

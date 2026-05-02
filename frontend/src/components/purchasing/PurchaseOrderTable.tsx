@@ -55,7 +55,7 @@ export default function PurchaseOrderTable({
 
               return (
                 <tr key={po.id} style={trStyle}>
-                  <td style={{ ...tdStyle, fontWeight: 800, color: '#0A2540' }}>
+                  <td style={{ ...tdStyle, fontWeight: 800, color: '#1D4ED8' }}>
                     #{po.id.toString().padStart(5, '0')}
                   </td>
                   

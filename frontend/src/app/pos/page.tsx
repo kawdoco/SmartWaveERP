@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
-// Replaced Contactless with Wifi and Laptop with Monitor for better compatibility
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShoppingCart, 
   Banknote, 
@@ -10,18 +9,67 @@ import {
   X, 
   Monitor, 
   Wifi, 
-  CreditCard as CardIcon 
+  CreditCard as CardIcon,
+  Plus,
+  Minus,
+  Trash2,
+  CheckCircle2,
+  Search,
+  Loader2,
+  Clock
 } from 'lucide-react';
+import { productApi, getStoredUser, AuthResponse, ProductVariantDTO } from '@/lib/api';
+
+// --- Types ---
+interface CartItem {
+  variantId: number;
+  barcode: string;
+  productName: string;
+  brand?: string;
+  size?: string;
+  color?: string;
+  sellingPrice: number;
+  quantity: number;
+}
 
 const POSInterface = () => {
-  const [subtotal] = useState(1550.00);
-  const [discount, setDiscount] = useState(0);
+  // --- State ---
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [discount, setDiscount] = useState<number>(0);
+  
   const [activeModal, setActiveModal] = useState<'none' | 'cash' | 'card'>('none');
   const [cardMethod, setCardMethod] = useState<'tap' | 'manual'>('tap');
   const [receivedAmount, setReceivedAmount] = useState<string>('');
+  const [saleSuccess, setSaleSuccess] = useState(false);
+  
+  const [currentUser, setCurrentUser] = useState<AuthResponse | null>(null);
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
-  const totalAmount = subtotal - discount;
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
 
+  // --- Effects ---
+  useEffect(() => {
+    setCurrentUser(getStoredUser());
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Ensure barcode input stays focused when modal is closed
+  useEffect(() => {
+    if (activeModal === 'none' && !saleSuccess) {
+      barcodeInputRef.current?.focus();
+    }
+  }, [activeModal, saleSuccess]);
+
+  // --- Derived State ---
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.sellingPrice * item.quantity), 0);
+  const totalAmount = Math.max(0, subtotal - discount);
+  const changeDue = Math.max(0, Number(receivedAmount) - totalAmount);
+
+  // --- Formatters ---
   const formatLKR = (amount: number) => {
     return new Intl.NumberFormat('en-LK', {
       style: 'currency',
@@ -30,94 +78,316 @@ const POSInterface = () => {
     }).format(amount).replace('LKR', 'Rs.');
   };
 
+  // --- Handlers ---
+  const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
+    if ('key' in e && e.key !== 'Enter') return;
+    e.preventDefault();
+    
+    if (!barcodeInput.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const variant = await productApi.getVariantByBarcode(barcodeInput.trim());
+      
+      // Check if already in cart
+      const existingItemIndex = cartItems.findIndex(item => item.variantId === variant.id);
+      
+      if (existingItemIndex >= 0) {
+        const newItems = [...cartItems];
+        newItems[existingItemIndex].quantity += 1;
+        setCartItems(newItems);
+      } else {
+        // We don't have the parent product name in variant DTO easily without another call, 
+        // so we'll use a placeholder or brand+color if name is missing from the API response
+        setCartItems([{
+          variantId: variant.id,
+          barcode: variant.barcode,
+          productName: `Product #${variant.id}`, // Ideal: fetch product details or update API
+          brand: variant.brand,
+          size: variant.size,
+          color: variant.color,
+          sellingPrice: variant.sellingPrice,
+          quantity: 1
+        }, ...cartItems]);
+      }
+      setBarcodeInput('');
+    } catch (err: any) {
+      setSearchError('Product not found');
+      setTimeout(() => setSearchError(null), 3000);
+    } finally {
+      setIsSearching(false);
+      barcodeInputRef.current?.focus();
+    }
+  };
+
+  const updateQuantity = (variantId: number, delta: number) => {
+    setCartItems(prev => prev.map(item => {
+      if (item.variantId === variantId) {
+        const newQty = Math.max(1, item.quantity + delta);
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
+  };
+
+  const removeItem = (variantId: number) => {
+    setCartItems(prev => prev.filter(item => item.variantId !== variantId));
+  };
+
+  const handleClearOrder = () => {
+    setCartItems([]);
+    setDiscount(0);
+    setBarcodeInput('');
+    barcodeInputRef.current?.focus();
+  };
+
+  const handleCompleteSale = async (method: 'CASH' | 'CARD') => {
+    // TODO: Connect to backend when POS endpoint is ready.
+    // Example: await posApi.createSale({ items: cartItems, discount, paymentMethod: method });
+    
+    setActiveModal('none');
+    setSaleSuccess(true);
+  };
+
+  const handleNewSale = () => {
+    setSaleSuccess(false);
+    handleClearOrder();
+  };
+
+  // --- Render ---
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-8 font-sans text-slate-800">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="min-h-[calc(100vh-64px)] bg-[#f8fafc] p-6 font-sans text-slate-800 flex flex-col">
+      
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6 px-2">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#1D4ED8]">Point of Sale</h1>
+          <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+            Terminal 01 • Cashier: {currentUser?.fullName || 'Demo User'}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-slate-500 font-medium bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200">
+          <Clock size={16} className="text-[#1D4ED8]" />
+          {currentTime ? currentTime.toLocaleTimeString() : '--:--:--'}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 items-start">
         
-        {/* Left Section */}
-        <div className="md:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-4 flex items-center text-slate-400"><Barcode size={20} /></div>
-              <input type="text" placeholder="Scan barcode..." className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-200 text-lg" />
+        {/* LEFT PANEL: Cart & Search */}
+        <div className="lg:col-span-2 space-y-4 flex flex-col h-full">
+          
+          {/* Search Bar */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative">
+            <div className="absolute inset-y-0 left-6 flex items-center text-slate-400">
+              {isSearching ? <Loader2 size={20} className="animate-spin text-[#1D4ED8]" /> : <Search size={20} />}
             </div>
+            <input 
+              ref={barcodeInputRef}
+              type="text" 
+              value={barcodeInput}
+              onChange={(e) => setBarcodeInput(e.target.value)}
+              onKeyDown={handleBarcodeSubmit}
+              placeholder="Scan barcode or type and press Enter..." 
+              className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-lg transition-all`}
+              autoFocus
+            />
+            {searchError && (
+              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500 bg-red-50 px-2 py-1 rounded">
+                {searchError}
+              </span>
+            )}
           </div>
-          <div className="bg-white rounded-2xl border border-slate-200 min-h-[400px] flex flex-col items-center justify-center text-slate-300">
-            <ShoppingCart size={64} strokeWidth={1} className="mb-4 opacity-20" />
-            <p className="font-medium text-slate-400">Cart is empty</p>
+
+          {/* Cart Table */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col overflow-hidden min-h-[400px]">
+            <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 grid grid-cols-12 gap-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <div className="col-span-5">Product</div>
+              <div className="col-span-3 text-center">Quantity</div>
+              <div className="col-span-3 text-right">Price</div>
+              <div className="col-span-1 text-center"></div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2">
+              {cartItems.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-slate-300 min-h-[300px]">
+                  <ShoppingCart size={64} strokeWidth={1} className="mb-4 opacity-20 text-[#1D4ED8]" />
+                  <p className="font-medium text-slate-400">Cart is empty</p>
+                  <p className="text-sm mt-2">Scan a barcode to add items</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {cartItems.map((item) => (
+                    <div key={item.variantId} className="grid grid-cols-12 gap-4 items-center px-4 py-3 bg-white hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-colors group">
+                      
+                      <div className="col-span-5 flex flex-col">
+                        <span className="font-bold text-slate-800">{item.productName}</span>
+                        <div className="flex gap-2 mt-1">
+                          {item.brand && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{item.brand}</span>}
+                          {item.size && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{item.size}</span>}
+                          {item.color && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{item.color}</span>}
+                        </div>
+                        <span className="text-[10px] text-slate-400 mt-1 uppercase">ID: {item.barcode}</span>
+                      </div>
+
+                      <div className="col-span-3 flex items-center justify-center gap-3">
+                        <button onClick={() => updateQuantity(item.variantId, -1)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-[#1D4ED8] transition-colors"><Minus size={14}/></button>
+                        <span className="w-8 text-center font-bold text-lg">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.variantId, 1)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-[#1D4ED8] transition-colors"><Plus size={14}/></button>
+                      </div>
+
+                      <div className="col-span-3 text-right flex flex-col">
+                        <span className="font-bold text-slate-800 text-lg">{formatLKR(item.sellingPrice * item.quantity)}</span>
+                        {item.quantity > 1 && <span className="text-xs text-slate-400">{formatLKR(item.sellingPrice)} each</span>}
+                      </div>
+
+                      <div className="col-span-1 flex justify-center">
+                        <button onClick={() => removeItem(item.variantId)} className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Right Section */}
-        <div className="md:col-span-1">
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm sticky top-8">
-            <h2 className="text-2xl font-bold mb-8">Order Summary</h2>
-            <div className="space-y-6">
-              <div className="flex justify-between text-slate-500 text-lg"><span>Subtotal</span><span>{formatLKR(subtotal)}</span></div>
-              <div className="flex justify-between items-center text-slate-500 text-lg">
+        {/* RIGHT PANEL: Order Summary */}
+        <div className="lg:col-span-1">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-6">
+            <h2 className="text-xl font-extrabold text-[#1D4ED8] mb-6 flex items-center gap-2">
+              <Banknote size={24} />
+              Order Summary
+            </h2>
+            
+            <div className="space-y-5">
+              <div className="flex justify-between text-slate-600 font-semibold text-sm">
+                <span>Subtotal ({cartItems.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+                <span>{formatLKR(subtotal)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center text-slate-600 font-semibold text-sm">
                 <span>Discount</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold opacity-50">Rs.</span>
-                  <input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="w-24 px-3 py-1 border-2 border-slate-800 rounded-md text-right font-bold text-slate-900 outline-none" />
+                  <span className="text-xs font-bold text-slate-400">Rs.</span>
+                  <input 
+                    type="number" 
+                    value={discount || ''} 
+                    onChange={(e) => setDiscount(Number(e.target.value))} 
+                    className="w-20 px-2 py-1 border border-slate-300 rounded text-right font-bold text-slate-900 outline-none focus:border-[#1D4ED8] focus:ring-1 focus:ring-[#1D4ED8] transition-all" 
+                    placeholder="0"
+                  />
                 </div>
               </div>
-              <div className="border-t border-dashed border-slate-200 pt-6"></div>
-              <div className="flex justify-between items-end mb-10">
-                <span className="text-lg font-semibold text-gray-500 pb-1">Total Amount</span>
-                <span className="text-4xl font-black text-slate-900">{formatLKR(totalAmount)}</span>
+              
+              <div className="border-t border-dashed border-slate-200 pt-4"></div>
+              
+              <div className="flex justify-between items-end mb-8">
+                <span className="text-sm font-bold text-slate-500 uppercase tracking-wider pb-1">Total Due</span>
+                <span className="text-4xl font-black text-[#1D4ED8]">{formatLKR(totalAmount)}</span>
               </div>
-              <button onClick={() => setActiveModal('cash')} className="w-full bg-[#82D1B1] text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-95 transition-all shadow-md"><Banknote /> Pay with Cash</button>
-              <button onClick={() => setActiveModal('card')} className="w-full bg-[#8E8E8E] text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-95 transition-all shadow-md"><CreditCard /> Pay with Card</button>
+
+              <div className="space-y-3">
+                <button 
+                  onClick={() => setActiveModal('cash')} 
+                  disabled={cartItems.length === 0}
+                  className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Banknote size={20} /> Pay with Cash
+                </button>
+                <button 
+                  onClick={() => setActiveModal('card')} 
+                  disabled={cartItems.length === 0}
+                  className="w-full bg-white border-2 border-[#1D4ED8] text-[#1D4ED8] hover:bg-[#EFF6FF] py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+                >
+                  <CreditCard size={20} /> Pay with Card
+                </button>
+              </div>
+
+              <div className="pt-6">
+                <button 
+                  onClick={handleClearOrder}
+                  disabled={cartItems.length === 0}
+                  className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 size={16} /> Clear Order
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* --- PAYMENT MODAL --- */}
-      {activeModal !== 'none' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden">
+      {activeModal !== 'none' && !saleSuccess && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-slate-800">{activeModal === 'cash' ? 'Cash Payment' : 'Card Payment'}</h3>
-              <button onClick={() => setActiveModal('none')} className="hover:bg-slate-100 p-2 rounded-full"><X size={20} /></button>
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-lg font-extrabold text-[#1D4ED8] flex items-center gap-2">
+                {activeModal === 'cash' ? <Banknote/> : <CreditCard/>} 
+                {activeModal === 'cash' ? 'Cash Payment' : 'Card Payment'}
+              </h3>
+              <button onClick={() => setActiveModal('none')} className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-2 rounded-full transition-colors"><X size={20} /></button>
             </div>
 
             <div className="p-8">
-              <div className="text-center mb-8 bg-slate-50 py-6 rounded-2xl border border-slate-100">
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Amount Due</p>
-                <h4 className="text-4xl font-black text-slate-900">{formatLKR(totalAmount)}</h4>
+              <div className="text-center mb-8 bg-[#EFF6FF] py-6 rounded-2xl border border-[#BFDBFE]">
+                <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Amount Due</p>
+                <h4 className="text-4xl font-black text-[#1D4ED8]">{formatLKR(totalAmount)}</h4>
               </div>
 
               {activeModal === 'cash' ? (
                 <div className="space-y-6">
                   <div className="relative">
-                    <label className="block text-sm font-bold text-slate-600 mb-2 uppercase tracking-wide">Received Amount</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Received Amount</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">Rs.</span>
-                      <input autoFocus type="number" value={receivedAmount} onChange={(e) => setReceivedAmount(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-200 rounded-2xl text-2xl font-bold text-slate-900 focus:border-[#82D1B1] outline-none transition-all" placeholder="0.00" />
+                      <input 
+                        autoFocus 
+                        type="number" 
+                        value={receivedAmount} 
+                        onChange={(e) => setReceivedAmount(e.target.value)} 
+                        className="w-full pl-14 pr-4 py-4 bg-white border-2 border-slate-200 rounded-2xl text-2xl font-bold text-slate-900 focus:border-[#1D4ED8] focus:ring-4 focus:ring-[#BFDBFE] outline-none transition-all" 
+                        placeholder="0.00" 
+                      />
                     </div>
                   </div>
-                  <div className="p-5 bg-[#82D1B1]/10 rounded-2xl border border-[#82D1B1]/20 flex justify-between items-center">
+                  
+                  <div className={`p-5 rounded-2xl border flex justify-between items-center transition-colors ${Number(receivedAmount) >= totalAmount ? 'bg-[#ECFDF5] border-[#A7F3D0]' : 'bg-slate-50 border-slate-100'}`}>
                     <span className="font-bold text-slate-600">Change Due:</span>
-                    <span className="text-2xl font-black text-[#69b394]">{formatLKR(Math.max(0, Number(receivedAmount) - totalAmount))}</span>
+                    <span className={`text-2xl font-black ${Number(receivedAmount) >= totalAmount ? 'text-[#059669]' : 'text-slate-400'}`}>
+                      {formatLKR(changeDue)}
+                    </span>
                   </div>
-                  <button className="w-full bg-[#82D1B1] text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:brightness-105 transition-all">Complete Sale</button>
+                  
+                  <button 
+                    onClick={() => handleCompleteSale('CASH')}
+                    disabled={Number(receivedAmount) < totalAmount}
+                    className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Complete Sale
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-6">
                   <div className="flex p-1 bg-slate-100 rounded-xl mb-4">
-                    <button onClick={() => setCardMethod('tap')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-all ${cardMethod === 'tap' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+                    <button onClick={() => setCardMethod('tap')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-all ${cardMethod === 'tap' ? 'bg-white text-[#1D4ED8] shadow-sm' : 'text-slate-500'}`}>
                       <Wifi size={18} className="rotate-90" /> Tap / Swipe
                     </button>
-                    <button onClick={() => setCardMethod('manual')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-all ${cardMethod === 'manual' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+                    <button onClick={() => setCardMethod('manual')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-sm transition-all ${cardMethod === 'manual' ? 'bg-white text-[#1D4ED8] shadow-sm' : 'text-slate-500'}`}>
                       <Monitor size={18} /> Manual Entry
                     </button>
                   </div>
 
                   {cardMethod === 'tap' ? (
                     <div className="text-center py-10">
-                      <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                      <div className="w-20 h-20 bg-[#EFF6FF] text-[#1D4ED8] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                         <Wifi size={40} className="rotate-90" />
                       </div>
                       <p className="text-slate-500 font-bold">Waiting for card action...</p>
@@ -127,22 +397,78 @@ const POSInterface = () => {
                       <div>
                         <label className="text-[10px] font-black uppercase text-slate-400 mb-1 block">Card Number</label>
                         <div className="relative">
-                          <input type="text" placeholder="0000 0000 0000 0000" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none" />
+                          <input type="text" placeholder="0000 0000 0000 0000" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none focus:border-[#1D4ED8] transition-colors" />
                           <CardIcon className="absolute right-4 top-4 text-slate-300" size={20} />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <input type="text" placeholder="MM/YY" className="p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none" />
-                        <input type="text" placeholder="CVV" className="p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none" />
+                        <input type="text" placeholder="MM/YY" className="p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none focus:border-[#1D4ED8] transition-colors" />
+                        <input type="text" placeholder="CVV" className="p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold outline-none focus:border-[#1D4ED8] transition-colors" />
                       </div>
                     </div>
                   )}
 
-                  <button className="w-full bg-slate-800 text-white py-5 rounded-2xl font-black text-xl hover:bg-slate-900 active:scale-95 transition-all">
-                    {cardMethod === 'tap' ? 'Processing...' : 'Charge Card'}
+                  <button 
+                    onClick={() => handleCompleteSale('CARD')}
+                    className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-5 rounded-2xl font-black text-xl hover:shadow-lg active:scale-[0.98] transition-all"
+                  >
+                    {cardMethod === 'tap' ? 'Simulate Success' : 'Charge Card'}
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- SUCCESS OVERLAY --- */}
+      {saleSuccess && (
+        <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center animate-in fade-in duration-300">
+          <div className="max-w-md w-full text-center p-8">
+            <div className="w-24 h-24 bg-[#ECFDF5] text-[#059669] rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 size={48} />
+            </div>
+            <h2 className="text-3xl font-black text-slate-800 mb-2">Sale Complete!</h2>
+            <p className="text-slate-500 font-medium mb-8">Payment processed successfully.</p>
+            
+            <div className="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-100 text-left space-y-3">
+              <div className="flex justify-between text-sm font-semibold text-slate-600">
+                <span>Items:</span>
+                <span>{cartItems.reduce((acc, item) => acc + item.quantity, 0)}</span>
+              </div>
+              <div className="flex justify-between text-sm font-semibold text-slate-600">
+                <span>Subtotal:</span>
+                <span>{formatLKR(subtotal)}</span>
+              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-sm font-semibold text-[#059669]">
+                  <span>Discount:</span>
+                  <span>-{formatLKR(discount)}</span>
+                </div>
+              )}
+              <div className="border-t border-slate-200 pt-3 flex justify-between font-black text-lg text-slate-800">
+                <span>Total Paid:</span>
+                <span>{formatLKR(totalAmount)}</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest pt-2">
+                <span>Method:</span>
+                <span>{activeModal}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <button 
+                className="w-full bg-white border-2 border-slate-200 text-slate-600 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-colors"
+                onClick={() => {/* print receipt logic */}}
+              >
+                Print Receipt
+              </button>
+              <button 
+                onClick={handleNewSale}
+                className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                New Sale
+              </button>
             </div>
           </div>
         </div>
