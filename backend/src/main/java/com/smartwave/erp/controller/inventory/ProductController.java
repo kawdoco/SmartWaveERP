@@ -49,6 +49,14 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/bulk-upload")
+    public ResponseEntity<java.util.Map<String, String>> bulkUpload(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        productService.bulkUpload(file);
+        java.util.Map<String, String> response = new java.util.HashMap<>();
+        response.put("message", "Bulk upload completed successfully");
+        return ResponseEntity.ok(response);
+    }
+
     // --- VARIANT MANAGEMENT ---
 
     @PostMapping("/{id}/variants")

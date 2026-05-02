@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Package, TrendingUp, AlertTriangle, Loader2 } from "lucide-react";
+import { Plus, Search, Package, TrendingUp, AlertTriangle, Loader2, Upload } from "lucide-react";
 import { productApi, ProductDTO } from "@/lib/api";
 import ProductTable from "@/components/products/ProductTable";
 import ProductModal from "@/components/products/ProductModal";
 import ProductVariantModal from "@/components/products/ProductVariantModal";
 import { ProductTableSkeleton } from "@/components/Skeleton";
+import BulkUploadModal from "@/components/products/BulkUploadModal";
 
 // Styling Imports
 import { 
@@ -40,6 +41,9 @@ export default function ProductsPage() {
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<any | null>(null);
+
+  // Bulk Upload Modal
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -120,9 +124,14 @@ export default function ProductsPage() {
           <h1 style={titleStyle}>Textile Inventory Dashboard</h1>
           <h2 style={subtitleStyle}>Manage your hierarchical catalog of models and stock varients.</h2>
         </div>
-        <button onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }} style={addButtonStyle}>
-          <Plus size={18} /> New Model
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={() => setIsBulkUploadModalOpen(true)} style={{ ...addButtonStyle, background: '#FFFFFF', color: '#1D4ED8', border: '2px solid #1D4ED8', boxShadow: 'none' }}>
+            <Upload size={18} /> Bulk Upload
+          </button>
+          <button onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }} style={addButtonStyle}>
+            <Plus size={18} /> New Model
+          </button>
+        </div>
       </div>
 
       <div style={statsRowStyle}>
@@ -169,6 +178,12 @@ export default function ProductsPage() {
         onSuccess={fetchProducts}
         productId={selectedProductId}
         variant={selectedVariant}
+      />
+
+      <BulkUploadModal 
+        isOpen={isBulkUploadModalOpen} 
+        onClose={() => setIsBulkUploadModalOpen(false)} 
+        onSuccess={fetchProducts} 
       />
     </div>
   );

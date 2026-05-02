@@ -80,6 +80,62 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    @Transactional
+    public void bulkUpload(org.springframework.web.multipart.MultipartFile file) {
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isFirstLine = true;
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // skip header
+                }
+                String[] data = line.split(",");
+                if (data.length < 10) continue;
+                
+                String productName = data[0].trim();
+                String category = data[1].trim();
+                String barcode = data[2].trim();
+                String brand = data[3].trim();
+                String size = data[4].trim();
+                String color = data[5].trim();
+                Double purchasePrice = Double.parseDouble(data[6].trim());
+                Double sellingPrice = Double.parseDouble(data[7].trim());
+                Integer quantity = Integer.parseInt(data[8].trim());
+                String status = data[9].trim();
+                
+                // Find or create product
+                Product product = productRepository.findByProductNameAndCategory(productName, category)
+                        .orElseGet(() -> {
+                            Product newProduct = new Product();
+                            newProduct.setProductName(productName);
+                            newProduct.setCategory(category);
+                            return productRepository.save(newProduct);
+                        });
+                
+                // Check if variant barcode already exists
+                if (variantRepository.findByBarcode(barcode).isPresent()) {
+                    continue; // Skip existing barcodes
+                }
+                
+                ProductVariant variant = new ProductVariant();
+                variant.setBarcode(barcode);
+                variant.setBrand(brand);
+                variant.setSize(size);
+                variant.setColor(color);
+                variant.setPurchasePrice(purchasePrice);
+                variant.setSellingPrice(sellingPrice);
+                variant.setQuantity(quantity);
+                variant.setStatus(status);
+                
+                product.addVariant(variant);
+                variantRepository.save(variant);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
+        }
+    }
+
     // --- VARIANT MANAGEMENT ---
 
     @Transactional
