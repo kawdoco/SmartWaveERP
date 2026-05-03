@@ -19,6 +19,7 @@ import {
   Clock
 } from 'lucide-react';
 import { productApi, posApi, getStoredUser, AuthResponse, ProductVariantDTO, ProductDTO } from '@/lib/api';
+import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
 
 // --- Types ---
 interface CartItem {
@@ -114,38 +115,47 @@ const POSInterface = () => {
     }
   };
 
-  const addToCart = (product: ProductDTO, variant: ProductVariantDTO) => {
-      const existingItemIndex = cartItems.findIndex(item => item.variantId === variant.id);
-      
-      if (existingItemIndex >= 0) {
-        const newItems = [...cartItems];
-        newItems[existingItemIndex].quantity += 1;
-        setCartItems(newItems);
-      } else {
-        setCartItems([{
-          variantId: variant.id,
-          barcode: variant.barcode,
-          productName: product.productName,
-          brand: variant.brand,
-          size: variant.size,
-          color: variant.color,
-          sellingPrice: variant.sellingPrice,
-          quantity: 1
-        }, ...cartItems]);
-      }
+  const addToCart = React.useCallback((product: ProductDTO, variant: ProductVariantDTO) => {
+      setCartItems(prev => {
+        const existingItemIndex = prev.findIndex(item => item.variantId === variant.id);
+        
+        if (existingItemIndex >= 0) {
+          const newItems = [...prev];
+          newItems[existingItemIndex].quantity += 1;
+          return newItems;
+        } else {
+          return [{
+            variantId: variant.id,
+            barcode: variant.barcode,
+            productName: product.productName,
+            brand: variant.brand,
+            size: variant.size,
+            color: variant.color,
+            sellingPrice: variant.sellingPrice,
+            quantity: 1
+          }, ...prev];
+        }
+      });
       setBarcodeInput('');
       setShowDropdown(false);
       barcodeInputRef.current?.focus();
-  };
+  }, []);
 
-  const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
-    if ('key' in e && e.key !== 'Enter') return;
-    e.preventDefault();
-    
-    if (!barcodeInput.trim()) return;
+  const handleScannerInput = React.useCallback(async (scannedBarcode: string) => {
+    if (!scannedBarcode.trim()) return;
 
-    // Check if there is an exact match in the local results
-    const exactMatch = searchResults.find(res => res.variant.barcode === barcodeInput.trim());
+    // Check if there is an exact match in allProducts
+    let exactMatch = null;
+    for (const p of allProducts) {
+      if (p.variants) {
+        const v = p.variants.find(v => v.barcode === scannedBarcode.trim());
+        if (v) {
+          exactMatch = { product: p, variant: v };
+          break;
+        }
+      }
+    }
+
     if (exactMatch) {
       addToCart(exactMatch.product, exactMatch.variant);
       return;
@@ -155,7 +165,7 @@ const POSInterface = () => {
     setSearchError(null);
 
     try {
-      const variant = await productApi.getVariantByBarcode(barcodeInput.trim());
+      const variant = await productApi.getVariantByBarcode(scannedBarcode.trim());
       addToCart({ id: 0, productName: `Product #${variant.id}`, category: 'Unknown', variants: [] }, variant);
     } catch (err: any) {
       setSearchError('Product not found');
@@ -164,6 +174,14 @@ const POSInterface = () => {
       setIsSearching(false);
       barcodeInputRef.current?.focus();
     }
+  }, [allProducts, addToCart]);
+
+  useBarcodeScanner({ onScan: handleScannerInput });
+
+  const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
+    if ('key' in e && e.key !== 'Enter') return;
+    e.preventDefault();
+    await handleScannerInput(barcodeInput);
   };
 
   const updateQuantity = (variantId: number, delta: number) => {
