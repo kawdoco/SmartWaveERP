@@ -47,7 +47,19 @@ public class User implements UserDetails {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+        
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
