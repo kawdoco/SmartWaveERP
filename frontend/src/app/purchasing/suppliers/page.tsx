@@ -67,12 +67,12 @@ export default function SuppliersPage() {
   }
 
   return (
-    <div style={pageStyle}>
+    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans">
       {/* Header Section */}
-      <div style={headerSectionStyle}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 style={titleStyle}>Supplier Management</h1>
-          <p style={subtitleStyle}>Oversee your supply chain partners and industrial vendor details.</p>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Supplier Management</h1>
+          <p className="text-sm text-slate-500 font-medium">Oversee your supply chain partners and industrial vendor details.</p>
         </div>
         <button onClick={handleCreate} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
           <Plus size={16} />
@@ -81,21 +81,21 @@ export default function SuppliersPage() {
       </div>
 
       {/* Stats Cards Row */}
-      <div style={statsRowStyle}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard 
-          icon={<Users size={24} color="#0A2540" />} 
+          icon={<Users size={20} className="text-[#0A2540]" />} 
           label="Total Partners" 
           value={suppliers.length.toString()} 
           bgColor="#EFF6FF" 
         />
         <StatCard 
-          icon={<Truck size={24} color="#059669" />} 
+          icon={<Truck size={20} className="text-[#059669]" />} 
           label="Active Suppliers" 
           value={suppliers.length.toString()} 
           bgColor="#ECFDF5" 
         />
         <StatCard 
-          icon={<ShieldCheck size={24} color="#7C3AED" />} 
+          icon={<ShieldCheck size={20} className="text-[#7C3AED]" />} 
           label="Verified Vendors" 
           value="100%" 
           bgColor="#F5F3FF" 
@@ -139,13 +139,13 @@ export default function SuppliersPage() {
 // Sub-component: StatCard
 function StatCard({ icon, label, value, bgColor }: { icon: React.ReactNode, label: string, value: string, bgColor: string }) {
   return (
-    <div style={statCardStyle}>
-      <div style={{ ...iconWrapperStyle, backgroundColor: bgColor }}>
+    <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-5 shadow-sm transition-all hover:shadow-md">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: bgColor }}>
         {icon}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <span style={statLabelStyle}>{label}</span>
-        <span style={statValueStyle}>{value}</span>
+      <div>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+        <p className="text-xl font-bold text-slate-900">{value}</p>
       </div>
     </div>
   );

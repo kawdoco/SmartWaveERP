@@ -117,12 +117,12 @@ export default function ProcurementPage() {
   }
 
   return (
-    <div style={pageStyle}>
+    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans">
       {/* Header Container */}
-      <div style={headerSectionStyle}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 style={titleStyle}>Procurement Dashboard</h1>
-          <p style={subtitleStyle}>Industrial grade supply chain management and purchase order tracking.</p>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Procurement Dashboard</h1>
+          <p className="text-sm text-slate-500 font-medium">Industrial grade supply chain management and purchase order tracking.</p>
         </div>
 
         <div className="flex gap-3">
@@ -143,24 +143,24 @@ export default function ProcurementPage() {
       </div>
 
       {/* Stats Overview */}
-      <div style={statsRowStyle}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard 
-          icon={<TrendingUp size={24} color="#0A2540" />} 
-          label="Total Procurement Value" 
-          value={`LKR ${totalInvestment.toLocaleString()}`} 
+          icon={<FileText size={20} className="text-[#0A2540]" />} 
+          label="Total Orders" 
+          value={loading ? "..." : purchaseOrders.length.toString()} 
           accent="#EFF6FF"
         />
         <StatCard 
-          icon={<FileText size={24} color="#7C3AED" />} 
-          label="Draft Orders" 
-          value={draftOrders.toString()} 
-          accent="#F5F3FF"
+          icon={<Users size={20} className="text-[#059669]" />} 
+          label="Active Suppliers" 
+          value={loading ? "..." : suppliers.length.toString()} 
+          accent="#ECFDF5"
         />
         <StatCard 
-          icon={<Users size={24} color="#059669" />} 
-          label="Vetted Suppliers" 
-          value={suppliers.length.toString()} 
-          accent="#ECFDF5"
+          icon={<TrendingUp size={20} className="text-[#1D4ED8]" />} 
+          label="Procurement Value Total" 
+          value={loading ? "LKR ..." : `LKR ${totalInvestment.toLocaleString()}`} 
+          accent="#F5F3FF"
         />
       </div>
 
@@ -241,13 +241,13 @@ export default function ProcurementPage() {
 // Sub-component: StatCard
 function StatCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string, accent: string }) {
   return (
-    <div style={statCardStyle}>
-      <div style={{ ...iconBoxStyle, backgroundColor: accent }}>
+    <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-5 shadow-sm transition-all hover:shadow-md">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: accent }}>
         {icon}
       </div>
       <div>
-        <p style={statLabelStyle}>{label}</p>
-        <p style={statValueStyle}>{value}</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+        <p className="text-xl font-bold text-slate-900">{value}</p>
       </div>
     </div>
   );

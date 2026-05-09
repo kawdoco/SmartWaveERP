@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Package, TrendingUp, AlertTriangle, Loader2, Upload } from "lucide-react";
+import { Plus, Search, Package, TrendingUp, AlertTriangle, Loader2, Upload, Layers } from "lucide-react";
 import { productApi, ProductDTO } from "@/lib/api";
 import ProductTable from "@/components/products/ProductTable";
 import ProductModal from "@/components/products/ProductModal";
@@ -44,6 +44,10 @@ export default function ProductsPage() {
 
   // Bulk Upload Modal
   const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
+
+  // Advanced Filtering
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [stockFilter, setStockFilter] = useState("ALL");
 
   useEffect(() => {
     fetchProducts();
@@ -96,33 +100,44 @@ export default function ProductsPage() {
     }
   };
 
-  const filteredProducts = products.filter(p => {
-    const q = searchQuery.toLowerCase();
-    const matchesModel = (p.productName?.toLowerCase() ?? "").includes(q) ||
-                         (p.category?.toLowerCase() ?? "").includes(q);
-    
-    const matchesVariant = p.variants?.some(v => 
-      (v.barcode?.toLowerCase() ?? "").includes(q) ||
-      (v.brand?.toLowerCase() ?? "").includes(q)
-    );
+  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
 
-    return matchesModel || matchesVariant;
+  const filteredProducts = products.filter(p => {
+    // 1. Search Query
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = (p.productName?.toLowerCase() ?? "").includes(q) ||
+                          (p.category?.toLowerCase() ?? "").includes(q) ||
+                          p.variants?.some(v => 
+                            (v.barcode?.toLowerCase() ?? "").includes(q) ||
+                            (v.brand?.toLowerCase() ?? "").includes(q)
+                          );
+    
+    // 2. Category Filter
+    const matchesCategory = categoryFilter === "ALL" || p.category === categoryFilter;
+
+    // 3. Stock Filter
+    const totalStock = p.variants?.reduce((sum, v) => sum + v.quantity, 0) || 0;
+    let matchesStock = true;
+    if (stockFilter === "IN_STOCK") matchesStock = totalStock > 0;
+    if (stockFilter === "LOW_STOCK") matchesStock = totalStock > 0 && totalStock < 10;
+    if (stockFilter === "OUT_OF_STOCK") matchesStock = totalStock === 0;
+
+    return matchesSearch && matchesCategory && matchesStock;
   });
 
   // Stats
-  const totalStockValue = products.reduce((acc, p) => 
-    acc + (p.variants?.reduce((vAcc, v) => vAcc + (v.quantity * (v.purchasePrice || 0)), 0) || 0), 0
-  );
+  const totalProducts = products.length;
+  const totalItems = products.reduce((acc, p) => acc + (p.variants?.length || 0), 0);
   const lowStockCount = products.reduce((acc, p) => 
     acc + (p.variants?.filter(v => v.quantity < 10).length || 0), 0
   );
 
   return (
-    <div style={pageStyle}>
-      <div style={headerSectionStyle}>
+    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 style={titleStyle}>Textile Inventory Dashboard</h1>
-          <h2 style={subtitleStyle}>Manage your hierarchical catalog of models and stock varients.</h2>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Textile Inventory Dashboard</h1>
+          <p className="text-sm text-slate-500 font-medium">Manage your hierarchical catalog of models and stock variants.</p>
         </div>
         <div className="flex gap-3">
           <button onClick={() => setIsBulkUploadModalOpen(true)} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
@@ -134,22 +149,55 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div style={statsRowStyle}>
-        <StatCard icon={<Package size={24} color="#0A2540" />} label="Master Models" value={loading ? "..." : products.length.toString()} accent="#EFF6FF" />
-        <StatCard icon={<TrendingUp size={24} color="#059669" />} label="Total Stock Value" value={loading ? "LKR ..." : `LKR ${totalStockValue.toLocaleString()}`} accent="#ECFDF5" />
-        <StatCard icon={<AlertTriangle size={24} color="#EF4444" />} label="Varient Alerts" value={loading ? "..." : lowStockCount.toString()} accent="#FEF2F2" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatCard icon={<Package size={20} className="text-[#0A2540]" />} label="Total Products" value={loading ? "..." : totalProducts.toString()} accent="#EFF6FF" />
+        <StatCard icon={<Layers size={20} className="text-[#1D4ED8]" />} label="Total Items (SKUs)" value={loading ? "..." : totalItems.toString()} accent="#EEF2FF" />
+        <StatCard icon={<AlertTriangle size={20} className="text-[#EF4444]" />} label="Low Stock Alerts" value={loading ? "..." : lowStockCount.toString()} accent="#FEF2F2" />
       </div>
 
-      <div style={tableContainerStyle}>
-        <div style={searchBarContainerStyle}>
-          <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '14px' }} />
-          <input 
-            style={searchInputStyle} 
-            placeholder="Search by Varient Barcode, Name or Category..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Bar */}
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text"
+              placeholder="Search by barcode, name, brand or category..." 
+              className="w-full pl-12 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-sm transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div className="w-full lg:w-48">
+            <select 
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1D4ED8] text-sm font-semibold text-slate-600 cursor-pointer appearance-none"
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="ALL">All Categories</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Stock Status Filter */}
+          <div className="w-full lg:w-48">
+            <select 
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1D4ED8] text-sm font-semibold text-slate-600 cursor-pointer appearance-none"
+              value={stockFilter}
+              onChange={(e) => setStockFilter(e.target.value)}
+            >
+              <option value="ALL">All Stock Status</option>
+              <option value="IN_STOCK">In Stock</option>
+              <option value="LOW_STOCK">Low Stock (&lt;10)</option>
+              <option value="OUT_OF_STOCK">Out of Stock</option>
+            </select>
+          </div>
         </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-0 overflow-hidden">
 
         {loading ? (
              <ProductTableSkeleton rows={5} />
@@ -191,11 +239,11 @@ export default function ProductsPage() {
 
 function StatCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string, accent: string }) {
   return (
-    <div style={{ ...statCardStyle }}>
-      <div style={{ ...iconWrapperStyle, backgroundColor: accent }}>{icon}</div>
+    <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-5 shadow-sm transition-all hover:shadow-md">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: accent }}>{icon}</div>
       <div>
-        <p style={statLabelStyle}>{label}</p>
-        <p style={statValueStyle}>{value}</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+        <p className="text-xl font-bold text-slate-900">{value}</p>
       </div>
     </div>
   );

@@ -190,44 +190,44 @@ export default function InventoryPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-[#EFF6FF] text-[#1D4ED8] rounded-xl flex items-center justify-center shrink-0">
-            <Package size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-[#EFF6FF] text-[#1D4ED8] rounded-xl flex items-center justify-center shrink-0">
+            <Package size={20} />
           </div>
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total SKUs</p>
-            <p className="text-2xl font-bold text-slate-900">{totalItems}</p>
+            <p className="text-xl font-bold text-slate-900">{totalItems}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center shrink-0">
-            <CheckCircle2 size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle2 size={20} />
           </div>
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Stock on Hand</p>
-            <p className="text-2xl font-bold text-slate-900">{totalStockQty}</p>
+            <p className="text-xl font-bold text-slate-900">{totalStockQty}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
-            <AlertTriangle size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
+            <AlertTriangle size={20} />
           </div>
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Low Stock</p>
-            <p className="text-2xl font-bold text-slate-900">{lowStockItems}</p>
+            <p className="text-xl font-bold text-slate-900">{lowStockItems}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm flex items-center gap-4 relative overflow-hidden">
+        <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm flex items-center gap-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-2 h-full bg-red-500"></div>
-          <div className="w-14 h-14 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
-            <XCircle size={28} />
+          <div className="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
+            <XCircle size={20} />
           </div>
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Out of Stock</p>
-            <p className="text-2xl font-bold text-red-600">{outOfStockItems}</p>
+            <p className="text-xl font-bold text-red-600">{outOfStockItems}</p>
           </div>
         </div>
       </div>
