@@ -8,7 +8,8 @@ import {
   productApi, 
   procurementApi, 
   supplierApi,
-  getStoredUser 
+  getStoredUser,
+  clearAuthData
 } from '@/lib/api';
 import { 
   TrendingUp, 
@@ -120,8 +121,14 @@ export default function Home() {
         pendingProcurement: procurement.filter(po => po.status === 'PENDING').length,
         lowStock: lowStock
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Dashboard Sync Failed:", err);
+      // If the token is expired/invalid, the backend returns 403.
+      // Clear stale auth data and redirect to login.
+      if (err?.message?.includes('403')) {
+        clearAuthData();
+        router.replace('/login');
+      }
     } finally {
       setLoading(false);
     }
