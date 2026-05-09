@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AppLayout from '../components/AppLayout';
-
+import Chatbot from '../components/Chatbot';
 export const metadata: Metadata = {
   title: 'SmartWave ERP',
   description: 'Enterprise Resource Planning System for Textile Retailers',
@@ -21,6 +21,7 @@ export default function RootLayout({
       </head>
       <body>
         <AppLayout>{children}</AppLayout>
+        <Chatbot />
       </body>
     </html>
   );

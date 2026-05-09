@@ -8,7 +8,8 @@ import {
   productApi, 
   procurementApi, 
   supplierApi,
-  getStoredUser 
+  getStoredUser,
+  clearAuthData
 } from '@/lib/api';
 import { 
   TrendingUp, 
@@ -50,7 +51,7 @@ const StatCard = ({
     </div>
     
     <div className="flex justify-between items-end mt-4">
-      <span className="text-4xl font-bold text-gray-900">{value}</span>
+      <span className="text-2xl font-bold text-gray-900">{value}</span>
       <div className="flex items-center text-blue-600 font-medium text-sm mb-1">
         <ArrowUpRight className="w-4 h-4 mr-0.5" />
         Live
@@ -120,8 +121,14 @@ export default function Home() {
         pendingProcurement: procurement.filter(po => po.status === 'PENDING').length,
         lowStock: lowStock
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Dashboard Sync Failed:", err);
+      // If the token is expired/invalid, the backend returns 403.
+      // Clear stale auth data and redirect to login.
+      if (err?.message?.includes('403')) {
+        clearAuthData();
+        router.replace('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -137,11 +144,11 @@ export default function Home() {
         <div>
            <div className="flex items-center gap-3 mb-2">
             <LayoutDashboard className="text-slate-900" size={28} />
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                 Operational Overview
             </h1>
            </div>
-           <p className="text-gray-500 text-lg mt-2 font-medium">
+           <p className="text-gray-500 text-sm mt-1 font-medium">
             Welcome back, <span className="text-gray-800 font-bold">{user?.fullName || 'System Admin'}</span>. Here's your SmartWave status.
            </p>
         </div>

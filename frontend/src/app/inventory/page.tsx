@@ -11,7 +11,8 @@ import {
   XCircle, 
   Download, 
   Loader2,
-  Barcode as BarcodeIcon
+  Barcode as BarcodeIcon,
+  Printer
 } from 'lucide-react';
 
 // --- Types ---
@@ -70,6 +71,44 @@ export default function InventoryPage() {
     }
   };
 
+  const handlePrintBarcode = (variant: FlattenedVariant) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    const html = `
+      <html>
+        <head>
+          <style>
+            @page { margin: 0; size: auto; }
+            body { font-family: sans-serif; width: 40mm; text-align: center; margin: 0 auto; padding: 5px; }
+            .name { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+            .price { font-size: 12px; font-weight: bold; margin-top: 2px; }
+            svg { max-width: 100%; height: auto; }
+          </style>
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+        </head>
+        <body>
+          <div class="name">${variant.parentProductName}</div>
+          <svg id="barcode"></svg>
+          <div class="price">Rs. ${variant.sellingPrice}</div>
+          <script>
+            window.onload = () => {
+              JsBarcode("#barcode", "${variant.barcode}", {
+                width: 1.5,
+                height: 30,
+                displayValue: true,
+                fontSize: 10,
+                margin: 0
+              });
+              setTimeout(() => { window.print(); window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   // --- Filtering Logic ---
   const filteredVariants = variants.filter(v => {
     // 1. Search Filter (Barcode, Name, Brand, Size, Color)
@@ -123,11 +162,11 @@ export default function InventoryPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] bg-[#f8fafc] text-red-500 gap-4 p-8 text-center">
         <XCircle size={48} className="text-red-400 mb-2" />
-        <h2 className="text-2xl font-bold text-slate-800">Connection Error</h2>
-        <p className="text-slate-500 max-w-md">{error}</p>
+        <h2 className="text-xl font-bold text-slate-800">Connection Error</h2>
+        <p className="text-sm text-slate-500 max-w-md">{error}</p>
         <button 
           onClick={fetchInventory}
-          className="mt-4 px-6 py-3 bg-[#1D4ED8] text-white rounded-xl font-bold hover:bg-[#1e40af] transition-colors"
+          className="mt-4 px-4 py-2 bg-[#1D4ED8] text-white rounded-lg font-medium text-sm hover:bg-[#1e40af] transition-colors shadow-sm"
         >
           Retry Connection
         </button>
@@ -141,54 +180,54 @@ export default function InventoryPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Inventory Ledger</h1>
-          <p className="text-slate-500 font-medium">Real-time stock tracking across all product variants.</p>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Inventory Ledger</h1>
+          <p className="text-sm text-slate-500 font-medium">Real-time stock tracking across all product variants.</p>
         </div>
-        <button className="bg-white border-2 border-slate-200 text-slate-600 hover:text-[#1D4ED8] hover:border-[#1D4ED8] px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-sm">
-          <Download size={18} /> Export CSV
+        <button className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+          <Download size={16} /> Export CSV
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-[#EFF6FF] text-[#1D4ED8] rounded-xl flex items-center justify-center shrink-0">
-            <Package size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-[#EFF6FF] text-[#1D4ED8] rounded-xl flex items-center justify-center shrink-0">
+            <Package size={20} />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Total SKUs</p>
-            <p className="text-3xl font-black text-slate-900">{totalItems}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total SKUs</p>
+            <p className="text-xl font-bold text-slate-900">{totalItems}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center shrink-0">
-            <CheckCircle2 size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle2 size={20} />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Stock on Hand</p>
-            <p className="text-3xl font-black text-slate-900">{totalStockQty}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Stock on Hand</p>
+            <p className="text-xl font-bold text-slate-900">{totalStockQty}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
-            <AlertTriangle size={28} />
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5">
+          <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
+            <AlertTriangle size={20} />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Low Stock</p>
-            <p className="text-3xl font-black text-slate-900">{lowStockItems}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Low Stock</p>
+            <p className="text-xl font-bold text-slate-900">{lowStockItems}</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm flex items-center gap-4 relative overflow-hidden">
+        <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm flex items-center gap-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-2 h-full bg-red-500"></div>
-          <div className="w-14 h-14 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
-            <XCircle size={28} />
+          <div className="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
+            <XCircle size={20} />
           </div>
           <div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Out of Stock</p>
-            <p className="text-3xl font-black text-red-600">{outOfStockItems}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Out of Stock</p>
+            <p className="text-xl font-bold text-red-600">{outOfStockItems}</p>
           </div>
         </div>
       </div>
@@ -263,9 +302,16 @@ export default function InventoryPage() {
                     
                     {/* Barcode */}
                     <td className="p-5 align-middle">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 group/barcode">
                         <BarcodeIcon size={16} className="text-slate-300" />
                         <span className="font-mono font-bold text-slate-600 text-sm tracking-wide">{v.barcode}</span>
+                        <button 
+                          onClick={() => handlePrintBarcode(v)}
+                          title="Print Barcode"
+                          className="opacity-0 group-hover/barcode:opacity-100 transition-opacity p-1 bg-slate-100 hover:bg-[#1D4ED8] hover:text-white rounded-md text-slate-400"
+                        >
+                          <Printer size={14} />
+                        </button>
                       </div>
                     </td>
 
