@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.22.0",
     "lucide-react": "^0.577.0",
     "next": "^16.2.2",
     "react": "19.2.3",

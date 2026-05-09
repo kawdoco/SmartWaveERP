@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   ShoppingCart, 
   Banknote, 
@@ -16,10 +16,12 @@ import {
   CheckCircle2,
   Search,
   Loader2,
-  Clock
+  Clock,
+  Camera
 } from 'lucide-react';
 import { productApi, posApi, getStoredUser, AuthResponse, ProductVariantDTO, ProductDTO } from '@/lib/api';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
+import BarcodeScanner from '@/components/BarcodeScanner';
 
 // --- Types ---
 interface CartItem {
@@ -49,6 +51,7 @@ const POSInterface = () => {
   const [cardMethod, setCardMethod] = useState<'tap' | 'manual'>('tap');
   const [receivedAmount, setReceivedAmount] = useState<string>('');
   const [saleSuccess, setSaleSuccess] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   
   const [currentUser, setCurrentUser] = useState<AuthResponse | null>(null);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -118,6 +121,7 @@ const POSInterface = () => {
     }
   };
 
+
   const addToCart = React.useCallback((product: ProductDTO, variant: ProductVariantDTO) => {
       setCartItems(prev => {
         const existingItemIndex = prev.findIndex(item => item.variantId === variant.id);
@@ -143,6 +147,24 @@ const POSInterface = () => {
       setShowDropdown(false);
       barcodeInputRef.current?.focus();
   }, []);
+
+  // Handle barcode detected from web scanner — placed AFTER addToCart to avoid TDZ
+  const handleScanDetected = useCallback((barcode: string) => {
+    for (const p of allProducts) {
+      if (!p.variants) continue;
+      for (const v of p.variants) {
+        if (v.barcode?.toLowerCase() === barcode.toLowerCase()) {
+          addToCart(p, v);
+          setShowScanner(false);
+          return;
+        }
+      }
+    }
+    // No exact match — populate search bar for manual selection
+    setBarcodeInput(barcode);
+    setShowScanner(false);
+    barcodeInputRef.current?.focus();
+  }, [allProducts, addToCart]);
 
   const handleScannerInput = React.useCallback(async (scannedBarcode: string) => {
     if (!scannedBarcode.trim()) return;
@@ -330,6 +352,7 @@ const POSInterface = () => {
 
   // --- Render ---
   return (
+    <>
     <div className="min-h-[calc(100vh-64px)] bg-[#f8fafc] p-6 font-sans text-slate-800 flex flex-col">
       
       {/* Header */}
@@ -353,26 +376,38 @@ const POSInterface = () => {
           
           {/* Search Bar */}
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative z-10">
-            <div className="absolute inset-y-0 left-6 flex items-center text-slate-400">
-              {isSearching ? <Loader2 size={20} className="animate-spin text-[#1D4ED8]" /> : <Search size={20} />}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-4 flex items-center text-slate-400 pointer-events-none">
+                  {isSearching ? <Loader2 size={18} className="animate-spin text-[#1D4ED8]" /> : <Search size={18} />}
+                </div>
+                <input 
+                  ref={barcodeInputRef}
+                  type="text" 
+                  value={barcodeInput}
+                  onChange={handleInputChange}
+                  onKeyDown={handleBarcodeSubmit}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  onFocus={() => { if(searchResults.length > 0) setShowDropdown(true); }}
+                  placeholder="Search by name, brand, or scan barcode..." 
+                  className={`w-full pl-11 pr-4 py-2.5 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-sm transition-all`}
+                  autoFocus
+                />
+                {searchError && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                    {searchError}
+                  </span>
+                )}
+              </div>
+              {/* Camera Scanner Button */}
+              <button
+                onClick={() => setShowScanner(true)}
+                title="Open Web Barcode Scanner"
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-[#EFF6FF] hover:bg-[#1D4ED8] text-[#1D4ED8] hover:text-white border border-[#BFDBFE] hover:border-[#1D4ED8] rounded-xl transition-all"
+              >
+                <Camera size={18} />
+              </button>
             </div>
-            <input 
-              ref={barcodeInputRef}
-              type="text" 
-              value={barcodeInput}
-              onChange={handleInputChange}
-              onKeyDown={handleBarcodeSubmit}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              onFocus={() => { if(searchResults.length > 0) setShowDropdown(true); }}
-              placeholder="Search by name, brand, or scan barcode..." 
-              className={`w-full pl-12 pr-4 py-2.5 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-sm transition-all`}
-              autoFocus
-            />
-            {searchError && (
-              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500 bg-red-50 px-2 py-1 rounded">
-                {searchError}
-              </span>
-            )}
             
             {/* Dropdown */}
             {showDropdown && searchResults.length > 0 && (
@@ -676,6 +711,15 @@ const POSInterface = () => {
         </div>
       )}
     </div>
+
+    {/* Web Barcode Scanner Modal */}
+    {showScanner && (
+      <BarcodeScanner
+        onDetected={handleScanDetected}
+        onClose={() => setShowScanner(false)}
+      />
+    )}
+    </>
   );
 };
 
