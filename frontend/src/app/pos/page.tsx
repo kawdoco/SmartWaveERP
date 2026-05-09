@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   ShoppingCart, 
   Banknote, 
@@ -16,10 +16,12 @@ import {
   CheckCircle2,
   Search,
   Loader2,
-  Clock
+  Clock,
+  Camera
 } from 'lucide-react';
 import { productApi, posApi, getStoredUser, AuthResponse, ProductVariantDTO, ProductDTO } from '@/lib/api';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
+import BarcodeScanner from '@/components/BarcodeScanner';
 
 // --- Types ---
 interface CartItem {
@@ -42,12 +44,14 @@ const POSInterface = () => {
   const [allProducts, setAllProducts] = useState<ProductDTO[]>([]);
   const [searchResults, setSearchResults] = useState<{product: ProductDTO, variant: ProductVariantDTO}[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [discount, setDiscount] = useState<number>(0);
   
   const [activeModal, setActiveModal] = useState<'none' | 'cash' | 'card'>('none');
   const [cardMethod, setCardMethod] = useState<'tap' | 'manual'>('tap');
   const [receivedAmount, setReceivedAmount] = useState<string>('');
   const [saleSuccess, setSaleSuccess] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   
   const [currentUser, setCurrentUser] = useState<AuthResponse | null>(null);
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
@@ -109,11 +113,14 @@ const POSInterface = () => {
       }
       setSearchResults(results.slice(0, 10)); // Limit to top 10
       setShowDropdown(true);
+      setSelectedIndex(-1);
     } else {
       setSearchResults([]);
       setShowDropdown(false);
+      setSelectedIndex(-1);
     }
   };
+
 
   const addToCart = React.useCallback((product: ProductDTO, variant: ProductVariantDTO) => {
       setCartItems(prev => {
@@ -140,6 +147,24 @@ const POSInterface = () => {
       setShowDropdown(false);
       barcodeInputRef.current?.focus();
   }, []);
+
+  // Handle barcode detected from web scanner — placed AFTER addToCart to avoid TDZ
+  const handleScanDetected = useCallback((barcode: string) => {
+    for (const p of allProducts) {
+      if (!p.variants) continue;
+      for (const v of p.variants) {
+        if (v.barcode?.toLowerCase() === barcode.toLowerCase()) {
+          addToCart(p, v);
+          setShowScanner(false);
+          return;
+        }
+      }
+    }
+    // No exact match — populate search bar for manual selection
+    setBarcodeInput(barcode);
+    setShowScanner(false);
+    barcodeInputRef.current?.focus();
+  }, [allProducts, addToCart]);
 
   const handleScannerInput = React.useCallback(async (scannedBarcode: string) => {
     if (!scannedBarcode.trim()) return;
@@ -179,9 +204,28 @@ const POSInterface = () => {
   useBarcodeScanner({ onScan: handleScannerInput });
 
   const handleBarcodeSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
-    if ('key' in e && e.key !== 'Enter') return;
-    e.preventDefault();
-    await handleScannerInput(barcodeInput);
+    if ('key' in e) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev < searchResults.length - 1 ? prev + 1 : prev));
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (showDropdown && searchResults.length > 0 && selectedIndex >= 0) {
+          const selected = searchResults[selectedIndex];
+          addToCart(selected.product, selected.variant);
+        } else {
+          await handleScannerInput(barcodeInput);
+        }
+        return;
+      }
+    }
   };
 
   const updateQuantity = (variantId: number, delta: number) => {
@@ -230,15 +274,92 @@ const POSInterface = () => {
     handleClearOrder();
   };
 
+  const handlePrintReceipt = () => {
+    const printerSize = localStorage.getItem('sw_printer') || '80mm';
+    let width = '100%';
+    let pageSizeCss = 'auto';
+
+    if (printerSize === '58mm') {
+      width = '58mm';
+      pageSizeCss = '58mm auto';
+    } else if (printerSize === '80mm') {
+      width = '80mm';
+      pageSizeCss = '80mm auto';
+    } else if (printerSize === '53mm') {
+      width = '53mm';
+      pageSizeCss = '53mm auto';
+    } else if (printerSize === 'A4') {
+      width = '210mm';
+      pageSizeCss = 'A4';
+    } else if (printerSize === 'A5') {
+      width = '148mm';
+      pageSizeCss = 'A5';
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    const html = `
+      <html>
+        <head>
+          <style>
+            @page { margin: 0; size: ${pageSizeCss}; }
+            body { font-family: monospace; width: ${width}; margin: 0 auto; padding: 10px; font-size: 12px; }
+            .center { text-align: center; }
+            .bold { font-weight: bold; }
+            .row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+            .dashed { border-bottom: 1px dashed #000; margin: 10px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="center bold" style="font-size: 16px;">SmartWave ERP</div>
+          <div class="center">POS Receipt</div>
+          <div class="dashed"></div>
+          <div>Date: ${new Date().toLocaleString('en-LK')}</div>
+          <div>Cashier: ${currentUser?.fullName || 'Demo User'}</div>
+          <div class="dashed"></div>
+          ${cartItems.map(item => `
+            <div>${item.productName}</div>
+            <div class="row">
+              <span>${item.quantity} x ${item.sellingPrice}</span>
+              <span>${item.quantity * item.sellingPrice}</span>
+            </div>
+          `).join('')}
+          <div class="dashed"></div>
+          <div class="row bold">
+            <span>Subtotal:</span>
+            <span>${subtotal}</span>
+          </div>
+          ${discount > 0 ? `<div class="row"><span>Discount:</span><span>-${discount}</span></div>` : ''}
+          <div class="row bold" style="font-size: 14px;">
+            <span>Total Paid:</span>
+            <span>${totalAmount}</span>
+          </div>
+          <div class="row">
+            <span>Payment Method:</span>
+            <span>${activeModal.toUpperCase()}</span>
+          </div>
+          <div class="dashed"></div>
+          <div class="center">Thank you for your purchase!</div>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+  };
+
   // --- Render ---
   return (
+    <>
     <div className="min-h-[calc(100vh-64px)] bg-[#f8fafc] p-6 font-sans text-slate-800 flex flex-col">
       
       {/* Header */}
       <div className="flex justify-between items-center mb-6 px-2">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#1D4ED8]">Point of Sale</h1>
-          <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">
+          <h1 className="text-xl font-bold text-[#1D4ED8]">Point of Sale</h1>
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-1">
             Terminal 01 • Cashier: {currentUser?.fullName || 'Demo User'}
           </p>
         </div>
@@ -255,26 +376,38 @@ const POSInterface = () => {
           
           {/* Search Bar */}
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative z-10">
-            <div className="absolute inset-y-0 left-6 flex items-center text-slate-400">
-              {isSearching ? <Loader2 size={20} className="animate-spin text-[#1D4ED8]" /> : <Search size={20} />}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-4 flex items-center text-slate-400 pointer-events-none">
+                  {isSearching ? <Loader2 size={18} className="animate-spin text-[#1D4ED8]" /> : <Search size={18} />}
+                </div>
+                <input 
+                  ref={barcodeInputRef}
+                  type="text" 
+                  value={barcodeInput}
+                  onChange={handleInputChange}
+                  onKeyDown={handleBarcodeSubmit}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  onFocus={() => { if(searchResults.length > 0) setShowDropdown(true); }}
+                  placeholder="Search by name, brand, or scan barcode..." 
+                  className={`w-full pl-11 pr-4 py-2.5 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-sm transition-all`}
+                  autoFocus
+                />
+                {searchError && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded">
+                    {searchError}
+                  </span>
+                )}
+              </div>
+              {/* Camera Scanner Button */}
+              <button
+                onClick={() => setShowScanner(true)}
+                title="Open Web Barcode Scanner"
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-[#EFF6FF] hover:bg-[#1D4ED8] text-[#1D4ED8] hover:text-white border border-[#BFDBFE] hover:border-[#1D4ED8] rounded-xl transition-all"
+              >
+                <Camera size={18} />
+              </button>
             </div>
-            <input 
-              ref={barcodeInputRef}
-              type="text" 
-              value={barcodeInput}
-              onChange={handleInputChange}
-              onKeyDown={handleBarcodeSubmit}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-              onFocus={() => { if(searchResults.length > 0) setShowDropdown(true); }}
-              placeholder="Search by name, brand, or scan barcode..." 
-              className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${searchError ? 'border-red-300 ring-1 ring-red-300' : 'border-slate-200'} rounded-xl outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-[#1D4ED8] text-lg transition-all`}
-              autoFocus
-            />
-            {searchError && (
-              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500 bg-red-50 px-2 py-1 rounded">
-                {searchError}
-              </span>
-            )}
             
             {/* Dropdown */}
             {showDropdown && searchResults.length > 0 && (
@@ -283,20 +416,21 @@ const POSInterface = () => {
                   <div 
                     key={`${res.product.id}-${res.variant.id}-${idx}`}
                     onMouseDown={() => addToCart(res.product, res.variant)}
-                    className="p-3 border-b border-slate-50 hover:bg-slate-50 cursor-pointer flex justify-between items-center transition-colors"
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={`p-3 border-b border-slate-50 cursor-pointer flex justify-between items-center transition-colors ${selectedIndex === idx ? 'bg-[#EFF6FF] border-[#BFDBFE]' : 'hover:bg-slate-50'}`}
                   >
                     <div>
-                      <div className="font-bold text-slate-800">{res.product.productName}</div>
-                      <div className="text-xs text-slate-500 flex gap-2 mt-0.5">
-                        <span className="bg-slate-100 px-1.5 rounded text-slate-700 font-bold">{res.variant.barcode}</span>
+                      <div className="font-semibold text-sm text-slate-800">{res.product.productName}</div>
+                      <div className="text-[11px] text-slate-500 flex gap-2 mt-0.5">
+                        <span className="bg-slate-100 px-1.5 rounded text-slate-700 font-semibold">{res.variant.barcode}</span>
                         {res.variant.brand && <span>• {res.variant.brand}</span>}
                         {res.variant.size && <span>• Size {res.variant.size}</span>}
                         {res.variant.color && <span>• {res.variant.color}</span>}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-black text-[#1D4ED8]">{formatLKR(res.variant.sellingPrice)}</div>
-                      <div className="text-[10px] text-slate-400 font-bold">{res.variant.quantity} in stock</div>
+                      <div className="font-bold text-[#1D4ED8] text-sm">{formatLKR(res.variant.sellingPrice)}</div>
+                      <div className="text-[10px] text-slate-400 font-semibold">{res.variant.quantity} in stock</div>
                     </div>
                   </div>
                 ))}
@@ -326,7 +460,7 @@ const POSInterface = () => {
                     <div key={item.variantId} className="grid grid-cols-12 gap-4 items-center px-4 py-3 bg-white hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-colors group">
                       
                       <div className="col-span-5 flex flex-col">
-                        <span className="font-bold text-slate-800">{item.productName}</span>
+                        <span className="font-semibold text-sm text-slate-800">{item.productName}</span>
                         <div className="flex gap-2 mt-1">
                           {item.brand && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{item.brand}</span>}
                           {item.size && <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{item.size}</span>}
@@ -342,8 +476,8 @@ const POSInterface = () => {
                       </div>
 
                       <div className="col-span-3 text-right flex flex-col">
-                        <span className="font-bold text-slate-800 text-lg">{formatLKR(item.sellingPrice * item.quantity)}</span>
-                        {item.quantity > 1 && <span className="text-xs text-slate-400">{formatLKR(item.sellingPrice)} each</span>}
+                        <span className="font-bold text-slate-800 text-sm">{formatLKR(item.sellingPrice * item.quantity)}</span>
+                        {item.quantity > 1 && <span className="text-[11px] text-slate-400">{formatLKR(item.sellingPrice)} each</span>}
                       </div>
 
                       <div className="col-span-1 flex justify-center">
@@ -363,8 +497,8 @@ const POSInterface = () => {
         {/* RIGHT PANEL: Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-6">
-            <h2 className="text-xl font-extrabold text-[#1D4ED8] mb-6 flex items-center gap-2">
-              <Banknote size={24} />
+            <h2 className="text-lg font-bold text-[#1D4ED8] mb-6 flex items-center gap-2">
+              <Banknote size={20} />
               Order Summary
             </h2>
             
@@ -391,24 +525,24 @@ const POSInterface = () => {
               <div className="border-t border-dashed border-slate-200 pt-4"></div>
               
               <div className="flex justify-between items-end mb-8">
-                <span className="text-sm font-bold text-slate-500 uppercase tracking-wider pb-1">Total Due</span>
-                <span className="text-4xl font-black text-[#1D4ED8]">{formatLKR(totalAmount)}</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider pb-1">Total Due</span>
+                <span className="text-2xl font-bold text-[#1D4ED8]">{formatLKR(totalAmount)}</span>
               </div>
 
               <div className="space-y-3">
                 <button 
                   onClick={() => setActiveModal('cash')} 
                   disabled={cartItems.length === 0}
-                  className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  <Banknote size={20} /> Pay with Cash
+                  <Banknote size={16} /> Pay with Cash
                 </button>
                 <button 
                   onClick={() => setActiveModal('card')} 
                   disabled={cartItems.length === 0}
-                  className="w-full bg-white border-2 border-[#1D4ED8] text-[#1D4ED8] hover:bg-[#EFF6FF] py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+                  className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  <CreditCard size={20} /> Pay with Card
+                  <CreditCard size={16} /> Pay with Card
                 </button>
               </div>
 
@@ -416,7 +550,7 @@ const POSInterface = () => {
                 <button 
                   onClick={handleClearOrder}
                   disabled={cartItems.length === 0}
-                  className="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   <Trash2 size={16} /> Clear Order
                 </button>
@@ -472,7 +606,7 @@ const POSInterface = () => {
                   <button 
                     onClick={() => handleCompleteSale('CASH')}
                     disabled={Number(receivedAmount) < totalAmount}
-                    className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
                     Complete Sale
                   </button>
@@ -513,7 +647,7 @@ const POSInterface = () => {
 
                   <button 
                     onClick={() => handleCompleteSale('CARD')}
-                    className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-5 rounded-2xl font-black text-xl hover:shadow-lg active:scale-[0.98] transition-all"
+                    className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
                   >
                     {cardMethod === 'tap' ? 'Simulate Success' : 'Charge Card'}
                   </button>
@@ -561,14 +695,14 @@ const POSInterface = () => {
 
             <div className="space-y-3">
               <button 
-                className="w-full bg-white border-2 border-slate-200 text-slate-600 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-colors"
-                onClick={() => {/* print receipt logic */}}
+                className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm transition-colors shadow-sm"
+                onClick={handlePrintReceipt}
               >
                 Print Receipt
               </button>
               <button 
                 onClick={handleNewSale}
-                className="w-full bg-gradient-to-r from-[#1E40AF] to-[#2563EB] text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+                className="w-full bg-[#1D4ED8] text-white hover:bg-[#1e40af] py-2 rounded-lg font-medium text-sm transition-all shadow-sm"
               >
                 New Sale
               </button>
@@ -577,6 +711,15 @@ const POSInterface = () => {
         </div>
       )}
     </div>
+
+    {/* Web Barcode Scanner Modal */}
+    {showScanner && (
+      <BarcodeScanner
+        onDetected={handleScanDetected}
+        onClose={() => setShowScanner(false)}
+      />
+    )}
+    </>
   );
 };
 

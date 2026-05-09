@@ -100,3 +100,21 @@ input:focus, select:focus, textarea:focus {
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideIn { from { transform: translateX(-8px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ---- Barcode Scanner Laser Line ---- */
+@keyframes scanLine {
+  0%   { top: 10%; }
+  50%  { top: 90%; }
+  100% { top: 10%; }
+}
+
+.animate-scan-line {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #1D4ED8, transparent);
+  animation: scanLine 1.8s ease-in-out infinite;
+  border-radius: 2px;
+  box-shadow: 0 0 6px 1px rgba(29, 78, 216, 0.6);
+}
