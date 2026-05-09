@@ -125,18 +125,18 @@ export default function ProcurementPage() {
           <p style={subtitleStyle}>Industrial grade supply chain management and purchase order tracking.</p>
         </div>
 
-        <div style={actionButtonGroupStyle}>
-          <button onClick={fetchData} style={secondaryButtonStyle} title="Refresh Data">
-            <RefreshCw size={18} />
+        <div className="flex gap-3">
+          <button onClick={fetchData} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm" title="Refresh Data">
+            <RefreshCw size={16} />
           </button>
           
-          <Link href="/purchasing/suppliers" style={secondaryButtonStyle}>
-            <Users size={18} />
+          <Link href="/purchasing/suppliers" className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+            <Users size={16} />
             <span>Manage Suppliers</span>
           </Link>
 
-          <Link href="/purchasing/create-po" style={primaryButtonStyle}>
-            <Plus size={18} />
+          <Link href="/purchasing/create-po" className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+            <Plus size={16} />
             <span>New Purchase Order</span>
           </Link>
         </div>
@@ -169,7 +169,7 @@ export default function ProcurementPage() {
         {error ? (
           <div style={errorBannerStyle}>
             <p><strong>Connection Error:</strong> {error}</p>
-            <button onClick={fetchData} style={retryButtonStyle}>Retry Connection</button>
+            <button onClick={fetchData} className="mt-4 px-4 py-2 bg-[#1D4ED8] text-white rounded-lg font-medium text-sm hover:bg-[#1e40af] transition-colors shadow-sm">Retry Connection</button>
           </div>
         ) : (
           <>

@@ -74,8 +74,8 @@ export default function SuppliersPage() {
           <h1 style={titleStyle}>Supplier Management</h1>
           <p style={subtitleStyle}>Oversee your supply chain partners and industrial vendor details.</p>
         </div>
-        <button onClick={handleCreate} style={addButtonStyle}>
-          <Plus size={18} />
+        <button onClick={handleCreate} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+          <Plus size={16} />
           <span>Register New Supplier</span>
         </button>
       </div>

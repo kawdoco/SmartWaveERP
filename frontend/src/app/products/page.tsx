@@ -124,12 +124,12 @@ export default function ProductsPage() {
           <h1 style={titleStyle}>Textile Inventory Dashboard</h1>
           <h2 style={subtitleStyle}>Manage your hierarchical catalog of models and stock varients.</h2>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={() => setIsBulkUploadModalOpen(true)} style={{ ...addButtonStyle, background: '#FFFFFF', color: '#1D4ED8', border: '2px solid #1D4ED8', boxShadow: 'none' }}>
-            <Upload size={18} /> Bulk Upload
+        <div className="flex gap-3">
+          <button onClick={() => setIsBulkUploadModalOpen(true)} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+            <Upload size={16} /> Bulk Upload
           </button>
-          <button onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }} style={addButtonStyle}>
-            <Plus size={18} /> New Model
+          <button onClick={() => { setSelectedProduct(null); setIsModalOpen(true); }} className="bg-[#1D4ED8] text-white hover:bg-[#1e40af] px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors shadow-sm">
+            <Plus size={16} /> New Model
           </button>
         </div>
       </div>

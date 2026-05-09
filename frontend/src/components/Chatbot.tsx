@@ -1,17 +1,56 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
+import { getStoredUser, productApi, posApi, supplierApi } from '@/lib/api';
+
+const GEMINI_API_KEY = "AIzaSyBhwI0nzkxTblTNYLC-GHBwKblQdbdToLA";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'system' | 'user' | 'bot', content: string }[]>([
-    { role: 'system', content: 'Hello! I am your SmartWave Assistant. How can I help you today?' }
+    { role: 'system', content: 'Hello! I am your SmartWave AI Assistant. Ask me anything about the system.' }
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(false);
+  const [systemContext, setSystemContext] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const user = getStoredUser();
+    if (user && user.role !== 'CASHIER') {
+      setIsAllowed(true);
+    }
+  }, []);
+
   const toggleChat = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    if (isOpen && isAllowed) {
+      Promise.all([
+        productApi.getAll().catch(()=>[]),
+        posApi.getAllSales().catch(()=>[]),
+        supplierApi.getAll().catch(()=>[])
+      ]).then(([products, sales, suppliers]) => {
+        const lowStock = products.flatMap(p => p.variants.map(v => ({...v, productName: p.productName})))
+          .filter(v => v.quantity <= 20)
+          .map(v => `${v.productName} (${v.barcode}) - Qty: ${v.quantity}`);
+        
+        const totalSales = sales.reduce((sum, s) => sum + s.totalAmount, 0);
+
+        let ctx = `\n\n--- CURRENT LIVE SYSTEM DATA ---\n`;
+        ctx += `- Total Products: ${products.length}\n`;
+        ctx += `- Total Suppliers: ${suppliers.length}\n`;
+        ctx += `- Total Revenue: Rs. ${totalSales.toLocaleString('en-LK')}\n`;
+        ctx += `- Low Stock Items (Qty <= 20): ${lowStock.length > 0 ? lowStock.join(', ') : 'None'}\n`;
+        ctx += `If the user asks for exact data, use this context to answer directly instead of just telling them where to find it.`;
+        
+        setSystemContext(ctx);
+      });
+    }
+  }, [isOpen, isAllowed]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,21 +60,53 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
-    // Add user message
-    const newMessages = [...messages, { role: 'user' as const, content: input }];
-    setMessages(newMessages);
+    const userMessage = input;
     setInput('');
+    const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    setMessages(newMessages);
+    setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'bot',
-        content: "I'm a smart assistant."
-      }]);
-    }, 1000);
+    try {
+      const contents = newMessages.filter(m => m.role !== 'system').map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }));
+
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: "You are the SmartWave ERP AI Assistant. Your job is to help the user with FAQs regarding the system. Keep your responses short, concise, and professional." + systemContext }]
+          },
+          contents
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Gemini API Error Response:", data);
+        setMessages(prev => [...prev, { role: 'bot', content: `API Error: ${data.error?.message || res.statusText}` }]);
+        return;
+      }
+
+      if (data.candidates && data.candidates.length > 0) {
+        const botResponse = data.candidates[0].content.parts[0].text;
+        setMessages(prev => [...prev, { role: 'bot', content: botResponse }]);
+      } else {
+        console.error("Unexpected Gemini response:", data);
+        setMessages(prev => [...prev, { role: 'bot', content: "Sorry, I received an empty response from the AI." }]);
+      }
+    } catch (error: any) {
+      console.error("Fetch error:", error);
+      setMessages(prev => [...prev, { role: 'bot', content: `Connection error: ${error.message}` }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -43,6 +114,7 @@ export default function Chatbot() {
       handleSend();
     }
   };
+  if (!isAllowed) return null;
 
   return (
     <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999, fontFamily: 'system-ui, sans-serif' }}>
@@ -114,10 +186,16 @@ export default function Chatbot() {
                   fontSize: '14px',
                   lineHeight: '1.5',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-                  border: msg.role === 'user' ? 'none' : '1px solid #e2e8f0'
+                  border: msg.role === 'user' ? 'none' : '1px solid #e2e8f0',
+                  whiteSpace: 'pre-wrap'
                 }}
               >
-                {msg.content}
+                {msg.content.split(/(\*\*.*?\*\*)/g).map((part, i) => {
+                  if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+                    return <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+                  }
+                  return <span key={i}>{part}</span>;
+                })}
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -165,7 +243,7 @@ export default function Chatbot() {
                 transition: 'all 0.2s'
               }}
             >
-              <Send size={18} style={{ marginLeft: input.trim() ? '2px' : '0' }} />
+                {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} style={{ marginLeft: input.trim() ? '2px' : '0' }} />}
             </button>
           </div>
         </div>
