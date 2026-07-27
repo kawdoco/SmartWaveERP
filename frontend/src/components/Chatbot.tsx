@@ -4,9 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import { getStoredUser, productApi, posApi, supplierApi } from '@/lib/api';
 
-const GEMINI_API_KEY = "AIzaSyBhwI0nzkxTblTNYLC-GHBwKblQdbdToLA";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'system' | 'user' | 'bot', content: string }[]>([
@@ -75,7 +72,7 @@ export default function Chatbot() {
         parts: [{ text: msg.content }]
       }));
 
-      const res = await fetch(GEMINI_URL, {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
